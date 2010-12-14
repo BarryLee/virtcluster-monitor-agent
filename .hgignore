@@ -1,0 +1,10 @@
+syntax: glob
+
+*~
+*.pyc
+*.swp
+*.vim
+
+syntax: regexp
+
+.*~$

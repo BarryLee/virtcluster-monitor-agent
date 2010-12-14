@@ -129,7 +129,9 @@ def get_os_info():
 
 
 if __name__ == '__main__':
-    print get_cpu_info()
-    print get_os_info()
-    print get_mem_info()
-    print model()
+    print 'CPU:\n', get_cpu_info()
+    print
+    print 'OS:\n', get_os_info()
+    print
+    print 'Memory:\n', get_mem_info()
+    #print model()
