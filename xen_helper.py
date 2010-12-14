@@ -156,7 +156,7 @@ def get_total_cpu_usage():
 
 
 if __name__ == '__main__':
-    #print get_total_cpu_usage()
+    print get_total_cpu_usage()
     out = run_xentop(1, 2)
     print out.split('xentop')
 
