@@ -1,0 +1,3 @@
+
+class ExecCmdException(Exception):
+    pass
