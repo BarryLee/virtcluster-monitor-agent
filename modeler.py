@@ -3,18 +3,8 @@ import subprocess
 import re
 
 from utils.utils import exec_cmd, proc2dict
+from config.env_var import *
 
-CPUINFO_PROC = '/proc/cpuinfo'
-XEN_PROC = '/proc/xen'
-MEMINFO_PROC = '/proc/meminfo'
-XM_PARH = '/usr/sbin/xm'
-XENTOP_PATH = '/usr/sbin/xentop'
-IFCONFIG_PATH = '/sbin/ifconfig'
-
-INTEL_VT = 'Intel_VT'
-INTEL_VT_FLAG = 'vmx'
-AMD_VT = 'AMD_VT'
-AMD_VT_FLAG = 'smx'
 XEN_VIRTTYPE = 'xen'
 
 def model():
@@ -24,7 +14,7 @@ def model():
     host['components'] = {}
     host['components']['cpu'] = get_cpu_info()
     host['components']['memory'] = get_mem_info()
-    host['components']['filesystem'] = get_filesystem_info()
+    host['components']['filesystem'] = get_disk_info()
     host['components']['network'] = get_network_info()
 
     return host
@@ -84,14 +74,59 @@ def get_xen_mem_info():
     memory['mem_total'] = XenBroker.get_mem_total(XM_PARH, XENTOP_PATH)
     return memory
     
-def get_filesystem_info():
-    fsinfo = {}
-    return
+def get_disk_info():
+    disk = { 'local' : {},
+             'other' : {} }
+
+    # get info of mounted fs
+    output = exec_cmd('df')
+    mounts = [line.strip().split() for line in output.splitlines()][1:]
+    for i in range(len(mounts)-1):
+        if len(mounts[i]) < 6:
+            mounts[i] += mounts[i+1]
+            del mounts[i+1]
+
+    # obtain info of all partitions
+    fd = open('/proc/partitions')
+    parts = [line.strip().split() for line in fd][2:]
+    fd.close()
+    #parts = map(lambda x: x[:-1]+['/dev/'+x[-1]], parts)
+
+    for i in mounts:
+        fsname = i[0]
+        if fsname.startswith('/dev/'):
+            fsname = fsname.rsplit('/')[-1]
+            catagory = 'local'
+        else:
+            catagory = 'other'
+        disk[catagory][fsname] = {}
+        disk[catagory][fsname]['capacity'] = int(i[1])
+        disk[catagory][fsname]['used'] = int(i[2])
+        disk[catagory][fsname]['avail'] = int(i[3])
+        disk[catagory][fsname]['usage'] = i[4]
+        disk[catagory][fsname]['mounted_on'] = i[5]
+
+    for i in parts:
+        partname = i[-1]
+        # skip disk
+        if not partname[-1].isdigit():
+            continue
+        if not disk['local'].has_key(partname):
+            disk['local'][partname] = {}
+            disk['local'][partname]['capacity'] = int(i[2])
+
+    return disk
 
 def get_network_info():
+    network = {}
     cmd = IFCONFIG_PATH
-    output = exec_cmd(IFCONFIG_PATH)
-    return ifconfig_parser(output)
+    #output = exec_cmd(IFCONFIG_PATH)
+    #return ifconfig_parser(output)
+    ifcfg = ifconfig_parser(exec_cmd(IFCONFIG_PATH))
+    for i in ifcfg:
+        network[i.pop('name')] = i
+
+    return network
 
 def ifconfig_parser(output):
     output = output.strip().split('\n\n')
@@ -129,9 +164,14 @@ def get_os_info():
 
 
 if __name__ == '__main__':
-    print 'CPU:\n', get_cpu_info()
-    print
-    print 'OS:\n', get_os_info()
-    print
-    print 'Memory:\n', get_mem_info()
-    #print model()
+    #print 'CPU:\n', get_cpu_info()
+    #print
+    #print 'OS:\n', get_os_info()
+    #print
+    #print 'Memory:\n', get_mem_info()
+    #print 
+    #print 'Disk:\n', get_disk_info()
+    import pprint
+    pp = pprint.PrettyPrinter(indent=2)
+    
+    pp.pprint(model())
