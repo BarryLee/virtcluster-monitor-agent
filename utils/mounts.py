@@ -11,7 +11,7 @@ from utils import subprocess
 mountfile = ['/etc/mtab', '/etc/mnttab', '/proc/mounts']
 
 
-class DumbStatus():
+class DumbStatus(object):
     "emulates statvfs results with only zero values"
     f_bsize = f_frsize = f_blocks = f_bfree = f_bavail = f_files = f_ffree = f_favail = f_flag = f_namemax =0
 
