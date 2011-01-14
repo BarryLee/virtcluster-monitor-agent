@@ -72,6 +72,10 @@ class XenBroker(object):
         return xmlist
 
     def updateDomainsDynamicInfo(self):
+        """exec xentop and get the updated info of:
+            total allocated memory for guest domains,
+            total CPU usage
+        """
         xentop = self._parseXentopOutput(self._runXentop(self.xentopDelay, 
                 self.xentopIters))
 
@@ -82,6 +86,8 @@ class XenBroker(object):
         self._info['total_domU_memory'] = reduce(lambda x,y:x+y, [int(dom[4]) 
                 for dom in domUs])
 
+        # sum up the 4th column for each domain(including domain-0), then divide
+        # the sum of all 9th column. Still not sure this is the correct method
         total_cpu_usage = float(dom0[3])
         total_vcpus = int(dom0[8])
         for d in domUs:

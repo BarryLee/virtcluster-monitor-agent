@@ -1,5 +1,4 @@
 import os.path
-import subprocess
 import re
 
 from utils.utils import exec_cmd, proc2dict
@@ -79,41 +78,39 @@ def get_disk_info():
              'other' : {} }
 
     # get info of mounted fs
-    output = exec_cmd('df')
-    mounts = [line.strip().split() for line in output.splitlines()][1:]
-    for i in range(len(mounts)-1):
-        if len(mounts[i]) < 6:
-            mounts[i] += mounts[i+1]
-            del mounts[i+1]
-
+    from utils import mounts
+    mountpoints = mounts.get_all_mountpoints()
+    
     # obtain info of all partitions
     fd = open('/proc/partitions')
     parts = [line.strip().split() for line in fd][2:]
     fd.close()
     #parts = map(lambda x: x[:-1]+['/dev/'+x[-1]], parts)
 
-    for i in mounts:
-        fsname = i[0]
-        if fsname.startswith('/dev/'):
-            fsname = fsname.rsplit('/')[-1]
-            catagory = 'local'
-        else:
+    for mp in mountpoints.keys():
+        device, fstype, opts = mountpoints[mp]
+        if device.startswith('/dev/'):
+            device = device.rsplit('/', 1)[-1]
+        mp_stat = mounts.get_mp_stat(mp)
+        if mp_stat['size'] == 0 or not mounts.is_local_fs(fstype):
             catagory = 'other'
-        disk[catagory][fsname] = {}
-        disk[catagory][fsname]['capacity'] = int(i[1])
-        disk[catagory][fsname]['used'] = int(i[2])
-        disk[catagory][fsname]['avail'] = int(i[3])
-        disk[catagory][fsname]['usage'] = i[4]
-        disk[catagory][fsname]['mounted_on'] = i[5]
+        else:
+            catagory = 'local'
 
-    for i in parts:
-        partname = i[-1]
+        disk[catagory][device] = {}
+        disk[catagory][device]['size'] = mounts.myformat(mp_stat['size'], '-k', mp_stat['blocksize'])
+        disk[catagory][device]['used'] = mounts.myformat(mp_stat['used'], '-k', mp_stat['blocksize'])
+        disk[catagory][device]['avail'] = mounts.myformat(mp_stat['avail'], '-k', mp_stat['blocksize'])
+        disk[catagory][device]['on'] = mp
+
+    for part in parts:
+        partname = part[-1]
         # skip disk
         if not partname[-1].isdigit():
             continue
         if not disk['local'].has_key(partname):
             disk['local'][partname] = {}
-            disk['local'][partname]['capacity'] = int(i[2])
+            disk['local'][partname]['size'] = int(part[2])
 
     return disk
 

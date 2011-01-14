@@ -7,6 +7,7 @@ import xmlrpclib
 import time
 import threading
 import subprocess
+import sys
 
 import minjson as json
 
@@ -146,6 +147,22 @@ def exec_cmd(cmd):
         else:
             return out
 
+# a hack for upward compatility to python 3
+if sys.version_info[0] < 3:
+    def subp_getstatusoutput(cmd):
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, 
+                             stderr=subprocess.PIPE, shell=True)
+        # communicate() will terminate the process, hence waitpid will
+        # encounter an error
+        #output = reduce(lambda x,y: x+y, map(lambda x: x and x or '', 
+                                             #p.communicate()))
+        status = os.waitpid(p.pid, 0)[1]
+        output = p.stdout.read() + p.stderr.read()
+        return status, output
+
+    subprocess.getstatusoutput = subp_getstatusoutput
+    subprocess.getoutput = lambda cmd: os.popen(cmd).read()
+
 def proc2dict(proc):
     '''
     The argument proc can be a string consists of several lines of <key>:<value>,
@@ -192,15 +209,20 @@ if __name__ == '__main__':
                 #if t is not threading.currentThread():
                     #t.join()
         
-        def testExecCmd(self):
+        #def testExecCmd(self):
             #exec_cmd('ls /root')
             #self.assertRaises(ExecCmdException, exec_cmd, 'ls /root')
-            exec_cmd('xm list')
+            #exec_cmd('xm list')
 
         def testProc2Dict(self):
             fd = open('/proc/cpuinfo')
             print proc2dict(fd)
             fd.close()
             print proc2dict(exec_cmd('cat /proc/meminfo'))
+
+        def testSubpNewMethod(self):
+            print subprocess.getoutput('ls /')
+            print subprocess.getstatusoutput('ls /root')
+            print subprocess.getstatusoutput('xm list')
     
     unittest.main()
