@@ -9,7 +9,7 @@ import threading
 import subprocess
 import sys
 
-import minjson as json
+import json
 
 #import mon_agent_logger
 from Exceptions import ExecCmdException
