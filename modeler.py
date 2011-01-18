@@ -2,9 +2,20 @@ import os.path
 import re
 
 from utils.utils import exec_cmd, proc2dict
-from config.env_var import *
+from utils.load_config import load_config
+
+CPUINFO_PROC = '/proc/cpuinfo'
+XEN_PROC = '/proc/xen'
+MEMINFO_PROC = '/proc/meminfo'
+
+INTEL_VT = 'Intel_VT'
+INTEL_VT_FLAG = 'vmx'
+AMD_VT = 'AMD_VT'
+AMD_VT_FLAG = 'smx'
 
 XEN_VIRTTYPE = 'xen'
+
+config = load_config()
 
 def model():
 
@@ -70,7 +81,8 @@ def get_phy_mem_info():
 def get_xen_mem_info():
     from utils import XenBroker
     memory = {}
-    memory['mem_total'] = XenBroker.get_mem_total(XM_PARH, XENTOP_PATH)
+    memory['mem_total'] = XenBroker.get_mem_total(config.get('xm_path'), 
+                                                  config.get('xentop_path'))
     return memory
     
 def get_disk_info():
@@ -116,10 +128,10 @@ def get_disk_info():
 
 def get_network_info():
     network = {}
-    cmd = IFCONFIG_PATH
+    cmd = config.get('ifconfig_path')
     #output = exec_cmd(IFCONFIG_PATH)
     #return ifconfig_parser(output)
-    ifcfg = ifconfig_parser(exec_cmd(IFCONFIG_PATH))
+    ifcfg = ifconfig_parser(exec_cmd(config.get('ifconfig_path')))
     for i in ifcfg:
         network[i.pop('name')] = i
 

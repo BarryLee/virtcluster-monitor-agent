@@ -9,7 +9,10 @@ import threading
 import subprocess
 import sys
 
-import json
+if sys.version[:3] >= '2.6':
+    import json
+else:
+    import simplejson as json
 
 #import mon_agent_logger
 from Exceptions import ExecCmdException
@@ -37,11 +40,6 @@ def file2string(path):
     fd.close()
     return astr
 
-def system_(cmd):
-    fd = os.popen(cmd)
-    output = fd.read()
-    fd.close()
-    return output
 
 def is_virt_plat():
     return os.access('/proc/xen', os.F_OK)
@@ -115,6 +113,10 @@ def threadinglize(target_, tName=None, isDaemon_=True):
         t.start()
     return func_
 
+current_directory = lambda f: os.path.dirname(os.path.abspath(f))
+
+parent_direcroty = lambda f: os.path.dirname(current_directory(f))
+
 #def load_config(config_file):
     #try:
         #fp = open(config_file)
@@ -130,10 +132,10 @@ def threadinglize(target_, tName=None, isDaemon_=True):
         #return config
 
 def decode(data):
-    return json.read(data)
+    return json.loads(data)
 
 def encode(data):
-    return json.write(data)
+    return json.dumps(data, sort_keys=True, indent=2)
 
 def exec_cmd(cmd):
     try:

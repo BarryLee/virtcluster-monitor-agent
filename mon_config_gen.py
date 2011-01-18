@@ -1,6 +1,6 @@
 import sys
 import os
-from mon_agent_utils import get_ip_address, encode
+from utils.utils import get_ip_address, encode
 
 curdir = os.path.dirname(os.path.abspath(__file__))
 MODULE_DIR = curdir + os.path.sep + 'modules'
