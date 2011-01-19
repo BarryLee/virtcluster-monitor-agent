@@ -84,7 +84,7 @@ class XenBroker(object):
 
         # dom[4] is the allocated memory for each dom, sum them up
         self._info['total_domU_memory'] = reduce(lambda x,y:x+y, [int(dom[4]) 
-                for dom in domUs])
+                for dom in domUs], 0)
 
         # sum up the 4th column for each domain(including domain-0), then divide
         # the sum of all 9th column. Still not sure this is the correct method
