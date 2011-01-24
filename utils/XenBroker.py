@@ -121,11 +121,11 @@ class XenBroker(object):
         domUdetails = []
         for line in output[1:]:
             if line.strip().startswith('Domain-0 '):
-                #dom0detail = [i.strip() for i in 
-                               #re.split(r'(?<=[\w-]) +(?!limit)', line)]
-                dom0detail = [i.strip() for i in line.split()]
-                if len(dom0detail) == 18:
-                    dom0detail.pop(6)
+                dom0detail = [i.strip() for i in 
+                               re.split(r'(?<=[\w-]) +(?!limit)', line)]
+                #dom0detail = [i.strip() for i in line.split()]
+                #if len(dom0detail) == 18:
+                    #dom0detail.pop(6)
             else:
                 domUdetails.append([i.strip() for i in line.split()])
 
