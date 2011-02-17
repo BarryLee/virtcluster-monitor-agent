@@ -44,7 +44,7 @@ def file2string(path):
 def is_virt_plat():
     return os.access('/proc/xen', os.F_OK)
 
-def getDictDeeply(dict_, keys):
+def get_from_dict(dict_, keys):
     ret = dict_
     if type(keys) is str:
         ret = dict_[keys]
@@ -55,7 +55,7 @@ def getDictDeeply(dict_, keys):
 
     return ret
 
-def setDictDeeply(dict_, keys, val, createMidNodes=False):
+def put_to_dict(dict_, keys, val, createMidNodes=False):
     if type(keys) is str:
         dict_[keys] = val
     else:
@@ -113,23 +113,9 @@ def threadinglize(target_, tName=None, isDaemon_=True):
         t.start()
     return func_
 
-current_directory = lambda f: os.path.dirname(os.path.abspath(f))
+current_dir = lambda f: os.path.dirname(os.path.abspath(f))
 
-parent_direcroty = lambda f: os.path.dirname(current_directory(f))
-
-#def load_config(config_file):
-    #try:
-        #fp = open(config_file)
-    #except IOError, e:
-        #if e.errno != 2:
-            #raise e
-        #else:
-            #raise MonAgentException, 'config file not found!'
-    #else:
-        #configstring = fp.read()
-        #config = decode(configstring)
-        #fp.close()
-        #return config
+parent_dir = lambda f: os.path.dirname(current_dir(f))
 
 def decode(data):
     return json.loads(data)

@@ -2,9 +2,9 @@
 
 import os.path
 
-from utils import parent_direcroty
+from utils import parent_dir
 
-DEFAULT_CONFIG = parent_direcroty(__file__) + os.path.sep + 'agentrc'
+DEFAULT_CONFIG = parent_dir(__file__) + os.path.sep + 'agentrc'
 
 #print DEFAULT_CONFIG
 
