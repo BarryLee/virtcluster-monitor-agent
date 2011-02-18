@@ -24,18 +24,19 @@ class NetModule(MonModule):
         super(NetModule, self).__init__()
 
     def update(self):
-        if self.info.has_key('netdev'):
-            self.info['last_netdev'] = self.info['netdev']
-            self.info['netdev'] = {}
+        if self._report.has_key('netdev'):
+            self._report['last_netdev'] = self._report['netdev']
+            self._report['netdev'] = {}
         
         super(NetModule, self).update()
 
-        rawdata = self.get_val('netdev')
-        for k,v in rawdata.items():
-            self.set_val(['netdev', k], [int(i) for i in v.split()])
+        rawdata = self._get_rawdata('netdev')
+        for k, v in rawdata.items():
+            self._set_report(['netdev', k], [int(i) for i in v.split()], True)
 
         rbi = rbo = rpi = rpo = 0
-        for k,v in rawdata.items():
+        report = self._get_report('netdev')
+        for k,v in report.items():
             for i in self._black_list:
                 if re.match(i, k) is not None:
                     continue
@@ -44,52 +45,62 @@ class NetModule(MonModule):
             rbo += v[8]
             rpo += v[9]
 
-        self.set_val(('netdev', 'realbytesin'), rbi, True)
-        self.set_val(('netdev', 'realbytesout'), rbo, True)
-        self.set_val(('netdev', 'realpacketsin'), rpi, True)
-        self.set_val(('netdev', 'realpacketsout'), rpo, True)
+        self._set_report(('netdev', 'realbytesin'), rbi, True)
+        self._set_report(('netdev', 'realbytesout'), rbo, True)
+        self._set_report(('netdev', 'realpacketsin'), rpi, True)
+        self._set_report(('netdev', 'realpacketsout'), rpo, True)
 
-        if not self.info.has_key('last_netdev'):
-            self.info['last_netdev'] = self.info['netdev']
+        if not self._report.has_key('last_netdev'):
+            self._report['last_netdev'] = self._report['netdev']
+
+
+    def _get_time_diff(self):
+        ret = super(NetModule, self)._get_time_diff() 
+        return ret < 1 and 1 or ret
+
 
     def get_bytes_in(self):
-        vdiff = self.get_val(('netdev', 'realbytesin')) - \
-                self.get_val(('last_netdev', 'realbytesin'))
+        vdiff = self._get_report(('netdev', 'realbytesin')) - \
+                self._get_report(('last_netdev', 'realbytesin'))
         if not vdiff > 0:
             return 0
-        tdiff = self.get_timestamp('netdev') - self.get_timestamp('last_netdev')
-        if tdiff < 1:
-            tdiff = 1
+        #tdiff = self.get_timestamp('netdev') - self.get_timestamp('last_netdev')
+        tdiff = self._get_time_diff()
+        #if tdiff < 1:
+            #tdiff = 1
         return int(vdiff / tdiff)
 
     def get_bytes_out(self):
-        vdiff = self.get_val(('netdev', 'realbytesout')) - \
-                self.get_val(('last_netdev', 'realbytesout'))
+        vdiff = self._get_report(('netdev', 'realbytesout')) - \
+                self._get_report(('last_netdev', 'realbytesout'))
         if not vdiff > 0:
             return 0
-        tdiff = self.get_timestamp('netdev') - self.get_timestamp('last_netdev')
-        if tdiff < 1:
-            tdiff = 1
+        tdiff = self._get_time_diff()
+        #tdiff = self.get_timestamp('netdev') - self.get_timestamp('last_netdev')
+        #if tdiff < 1:
+            #tdiff = 1
         return int(vdiff / tdiff)
 
     def get_packets_in(self):
-        vdiff = self.get_val(('netdev', 'realpacketsin')) - \
-                self.get_val(('last_netdev', 'realpacketsin'))
+        vdiff = self._get_report(('netdev', 'realpacketsin')) - \
+                self._get_report(('last_netdev', 'realpacketsin'))
         if not vdiff > 0:
             return 0
-        tdiff = self.get_timestamp('netdev') - self.get_timestamp('last_netdev')
-        if tdiff < 1:
-            tdiff = 1
+        tdiff = self._get_time_diff()
+        #tdiff = self.get_timestamp('netdev') - self.get_timestamp('last_netdev')
+        #if tdiff < 1:
+            #tdiff = 1
         return int(vdiff / tdiff)
 
     def get_packets_out(self):
-        vdiff = self.get_val(('netdev', 'realpacketsout')) - \
-                self.get_val(('last_netdev', 'realpacketsout'))
+        vdiff = self._get_report(('netdev', 'realpacketsout')) - \
+                self._get_report(('last_netdev', 'realpacketsout'))
         if not vdiff > 0:
             return 0
-        tdiff = self.get_timestamp('netdev') - self.get_timestamp('last_netdev')
-        if tdiff < 1:
-            tdiff = 1
+        tdiff = self._get_time_diff()
+        #tdiff = self.get_timestamp('netdev') - self.get_timestamp('last_netdev')
+        #if tdiff < 1:
+            #tdiff = 1
         return int(vdiff / tdiff)
 
 if __name__ == '__main__':

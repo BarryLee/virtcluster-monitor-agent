@@ -17,16 +17,16 @@ class LoadModule(MonModule):
 
     def update(self):
         super(LoadModule, self).update()
-        self.set_val('loadavg', self.get_val('loadavg').split())
+        self._set_report('loadavg', self._get_rawdata('loadavg').split())
 
     def get_load_one(self):
-        return self.get_val('loadavg')[0]
+        return self._get_report('loadavg')[0]
 
     def get_load_five(self):
-        return self.get_val('loadavg')[1]
+        return self._get_report('loadavg')[1]
 
     def get_load_fifteen(self):
-        return self.get_val('loadavg')[2]
+        return self._get_report('loadavg')[2]
 
 if __name__ == '__main__':
     import time

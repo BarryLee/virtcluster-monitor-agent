@@ -12,7 +12,11 @@ class MonModule(object):
 
 
     def __init__(self):
-        self.info = {}
+        self._rawdata = {}
+        self._report = {}
+        #self.info = {}
+        self._t_diff = 0
+        self._update_t = 0
         self.metric_init()
 
 
@@ -22,11 +26,15 @@ class MonModule(object):
 
     def update(self):
         for item in self.data_sources:
-            data = {}
+            #data = {}
             val = self._parse_file(item['path'], item['type'])
-            data['val'] = val
-            data['timestamp'] = time.time()
-            self.info[item['name']] = data
+            #data['val'] = val
+            #data['timestamp'] = time.time()
+            now = time.time()
+            self._t_diff = now - self._update_t
+            self._update_t = now
+            #self.info[item['name']] = data
+            self._rawdata[item['name']] = val
 
 
     def _parse_file(self, fpath, ftype):
@@ -49,31 +57,51 @@ class MonModule(object):
             return method(*args, **kwargs)
 
 
-    def get_val(self, keys):
-        if type(keys) is str:
-            keys = [keys, 'val']
-        else:
-            keys = list(keys)
-            keys.insert(1, 'val')
+    def get_update_time(self):
+        return self._update_t
+ 
 
-        return get_from_dict(self.info, keys)             
+    def _get_time_diff(self):
+        return self._t_diff
 
 
-    def set_val(self, keys, val, create=False):
-        if type(keys) is str:
-            put_to_dict(self.info, [keys, 'val'], val, create)
-        else:
-            keys = list(keys)
-            keys.insert(1, 'val')
-            put_to_dict(self.info, keys, val, create)
+    def _get_rawdata(self, keys):
+        return get_from_dict(self._rawdata, keys)             
+
+
+    def _set_rawdata(self, keys, val, create=False):
+        put_to_dict(self._rawdata, keys, val, create)
+
+
+    def _get_report(self, keys):
+        #if type(keys) is str:
+            #keys = [keys, 'val']
+        #else:
+            #keys = list(keys)
+            #keys.insert(1, 'val')
+
+        #return get_from_dict(self.info, keys)             
+        return get_from_dict(self._report, keys)             
+
+
+    def _set_report(self, keys, val, create=False):
+        #if type(keys) is str:
+            #put_to_dict(self.info, [keys, 'val'], val, create)
+        #else:
+            #keys = list(keys)
+            #keys.insert(1, 'val')
+            #put_to_dict(self.info, keys, val, create)
+        put_to_dict(self._report, keys, val, create)
 
 
     def get_timestamp(self, key):
-        return get_from_dict(self.info, [key, 'timestamp'])
+        #return get_from_dict(self.info, [key, 'timestamp'])
+        return self._update_t
 
 
     def set_timestamp(self, key, timestamp=time.time()):
-        put_to_dict(self.info, [key, 'timestamp'], timestamp, True)
+        #put_to_dict(self.info, [key, 'timestamp'], timestamp, True)
+        self._update_t = timestamp
 
 
 
