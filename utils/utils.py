@@ -3,7 +3,6 @@ import socket
 import fcntl
 import struct
 import os
-import xmlrpclib
 import time
 import threading
 import subprocess
@@ -27,22 +26,10 @@ def get_ip_address(ifname):
         struct.pack('256s', ifname[:15])
     )[20:24])
 
-def file2list(path):
-    fd = open(path, 'r')
-    lst = [[i.strip() for i in pair] for pair in [line.split(':') \
-                        for line in fd if line.strip() != '']] 
-    fd.close()
-    return lst
-
-def file2string(path):
-    fd = open(path, 'r')
-    astr = fd.read()
-    fd.close()
-    return astr
-
 
 def is_virt_plat():
     return os.access('/proc/xen', os.F_OK)
+
 
 def get_from_dict(dict_, keys):
     ret = dict_
@@ -118,10 +105,14 @@ current_dir = lambda f: os.path.dirname(os.path.abspath(f))
 parent_dir = lambda f: os.path.dirname(current_dir(f))
 
 def decode(data):
-    return json.loads(data)
+    #return json.loads(data)
+    return eval(data)
+
 
 def encode(data):
-    return json.dumps(data, sort_keys=True, indent=2)
+    #return json.dumps(data, sort_keys=True, indent=2)
+    return json.dumps(data)
+
 
 def exec_cmd(cmd):
     try:
@@ -160,6 +151,14 @@ def proc2dict(proc):
     return dict([[i.strip() for i in pair] for pair in [line.split(':', 1) 
             for line in ((type(proc) is str) and proc.splitlines() or proc) 
             if line.strip() != '']])
+
+
+import pprint
+pp = pprint.PrettyPrinter(indent=2)
+def _print(msg):
+    pp.pprint(msg)
+
+
 
 if __name__ == '__main__':
     import unittest

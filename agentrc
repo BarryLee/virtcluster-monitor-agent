@@ -2,10 +2,10 @@
 #
 
 # control server address
-control_server = '10.0.0.11:20060'
+monitor_server = '10.0.0.11:20060'
 
 # monitor data storage server address
-data_server = '10.0.0.11:20060'
+#data_server = '10.0.0.11:20060'
 
 # network interface to bind
 interface = 'eth0'

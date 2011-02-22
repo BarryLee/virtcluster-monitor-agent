@@ -118,8 +118,8 @@ def get_disk_info():
     for part in parts:
         partname = part[-1]
         # skip disk
-        if not partname[-1].isdigit() or partname.startswith('loop'):
-            continue
+        #if not partname[-1].isdigit() or partname.startswith('loop'):
+            #continue
         if not disk['local'].has_key(partname):
             disk['local'][partname] = {}
             disk['local'][partname]['size'] = int(part[2])
