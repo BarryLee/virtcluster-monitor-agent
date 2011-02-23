@@ -23,15 +23,16 @@ def import_module(module_name):
 
 class Collector(object):
 
-    def __init__(self, mod_name):
+    def __init__(self, mod_name, *args, **kwargs):
         self.mod_name = mod_name
         #mod = __import__(mod_name)  
         mod = import_module(mod_name)
         #_print(mod.__name__)
-        instance = getattr(mod, mod_name)()
+        instance = getattr(mod, mod_name)(*args, **kwargs)
         self.worker = instance
         self.handler = instance.metric_handler
         self.update = instance.update
+        self.object = instance.get_object()
         logger.debug('Collector.__init__: %s, %s' % (self.handler, self.update))
         self.metrics = []
         self.last_collect = 0
@@ -50,6 +51,8 @@ class Collector(object):
     def doCollect(self):
         retval = {}
         self.update()
+        if self.object is not None:
+            retval['object'] = self.object
         for metric in self.metrics:
             name = metric['name']
             retval[name] = self.handler(name)
@@ -104,16 +107,17 @@ class Sender(threading.Thread):
             else:
                 #Monitor.RUNNING = True
                 while self.CONT_FLAG:
+                    sleep(self._interval)
                     try:
                         self.collectAndSend()
                     except Exception, e:
                         logger.exception('')
                         #Monitor.RUNNING = False
-                        break
+                        #break
+                        raise
                     #self.cond.acquire()
                     # block until next collect
                     #self.cond.wait(self._interval)  
-                    sleep(self._interval)
 
 
 
@@ -132,7 +136,11 @@ class Controller(object):
     def start(self):
         for metric_group in self._metric_groups:
             modname = metric_group['name']
-            collector = Collector(modname)
+            if metric_group.has_key('args'):
+                args = metric_group['args']
+            else:
+                args = {}
+            collector = Collector(modname, **args)
             collector.setMetricGroup(metric_group["metrics"])
             collector.setPeriod(metric_group["period"])
             self.loadCollector(modname, collector)
@@ -142,7 +150,9 @@ class Controller(object):
     def loadCollector(self, cname, cinstance):
         # start this collector now
         s = Sender(cinstance, self._channel)
-        self._collectors[cname] = s
+        if not self._collectors.has_key(cname):
+            self._collectors[cname] = []
+        self._collectors[cname].append(s) 
         s.start()
 
     
