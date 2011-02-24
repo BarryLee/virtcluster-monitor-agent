@@ -92,8 +92,8 @@ class Sender(threading.Thread):
 
 
     def _send(self, channel, data):
-        #channel[2].sendto(data, (channel[0], channel[1]))
-        logger.debug(data)
+        channel[2].sendto(data, (channel[0], channel[1]))
+        #logger.debug(data)
 
 
     def run(self):
@@ -167,6 +167,7 @@ def main():
 
     #_print(metric_conf)
     host, port = global_config['monitor_server'].split(':')
+    port = int(port)
     Controller(metric_conf['metric_groups'], host, port).start()
     
     while True:
