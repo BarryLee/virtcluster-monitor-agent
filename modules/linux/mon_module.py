@@ -3,8 +3,10 @@ import os
 
 
 def file2list(path):
-    with open(path) as fd:
-        return [l for l in [line.strip() for line in fd] if l != '']
+    fd = open(path)
+    ret = [l for l in [line.strip() for line in fd] if l != '']
+    fd.close()
+    return ret
 
 
 def file2string(path):
@@ -15,11 +17,11 @@ def file2string(path):
 
 
 def file2dict(path, delimiter=':'):
-    with open(path, 'r') as fd:
-        return dict([[i.strip() for i in pair] for pair in [line.split(delimiter, 1)
+    fd = open(path)
+    ret = dict([[i.strip() for i in pair] for pair in [line.split(delimiter, 1)
                 for line in fd] if len(pair) == 2])
-        #return dict([[i.strip() for i in pair] for pair in [line.split(delimiter, 1) 
-                #for line in fd if line.strip() != '']])
+    fd.close()
+    return ret
  
 
 def get_from_dict(dict_, keys):

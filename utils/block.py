@@ -7,14 +7,16 @@ partitionfile = '/proc/partitions'
 block_dir = '/sys/block'
 
 def get_all_partitions():
-    with open(partitionfile) as fd:
-        parts = {}
-        fd.readline()
-        fd.readline()
-        for line in fd:
-            temp = line.split()
-            parts[temp[-1]] = map(lambda x: int(x), temp[0:-1])
-        return parts
+    fd = open(partitionfile)
+    parts = {}
+    # skip first 2 lines
+    fd.readline()
+    fd.readline()
+    for line in fd:
+        temp = line.split()
+        parts[temp[-1]] = map(lambda x: int(x), temp[0:-1])
+    fd.close()
+    return parts
 
 
 def get_disk_partition():

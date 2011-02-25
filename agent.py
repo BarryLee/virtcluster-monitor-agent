@@ -162,8 +162,9 @@ def main():
     #_print(global_config)
 
     metric_conf_file = current_dir(__file__) + os.path.sep + 'metric_conf'
-    with open(metric_conf_file) as f:
-        metric_conf = decode(f.read())
+    f = open(metric_conf_file)
+    metric_conf = decode(f.read())
+    f.close()
 
     #_print(metric_conf)
     host, port = global_config['monitor_server'].split(':')
