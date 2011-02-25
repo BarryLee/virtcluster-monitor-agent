@@ -2,15 +2,14 @@
 keys=root
 
 [handlers]
-;multiple values should be seperated by comma with no extra whitespaces.(for 2.4 compatibility)
-keys=consoleHandler,fileHandler
+keys=consoleHandler, fileHandler
 
 [formatters]
-keys=simpleFormatter,verboseFormatter
+keys=simpleFormatter, verboseFormatter
 
 [logger_root]
 level=NOTSET
-handlers=consoleHandler,fileHandler
+handlers=consoleHandler, fileHandler
 
 [handler_consoleHandler]
 class=StreamHandler
@@ -29,6 +28,5 @@ formatter=verboseFormatter
 args=('/tmp/monagent.log', 'a', 2*2**20, 7,)
 
 [formatter_verboseFormatter]
-;2.4 doesn't support funcName
-format=%(asctime)s - %(name)s - %(levelname)s - %(module)s: %(message)s
+format=%(asctime)s - %(name)s - %(levelname)s - %(module)s - %(funcName)s: %(message)s
 datefmt=

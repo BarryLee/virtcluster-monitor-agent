@@ -158,16 +158,6 @@ class MonModule(object):
         put_to_dict(self._report, keys, val, create)
 
 
-    def get_timestamp(self, key):
-        #return get_from_dict(self.info, [key, 'timestamp'])
-        return self._update_t
-
-
-    def set_timestamp(self, key, timestamp=time.time()):
-        #put_to_dict(self.info, [key, 'timestamp'], timestamp, True)
-        self._update_t = timestamp
-
-
     def get_object(self):
         return self._object
 

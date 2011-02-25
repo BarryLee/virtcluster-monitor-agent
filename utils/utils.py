@@ -8,10 +8,20 @@ import threading
 import subprocess
 import sys
 
+current_dir = lambda f: os.path.dirname(os.path.abspath(f))
+
+parent_dir = lambda f: os.path.dirname(current_dir(f))
+
 if sys.version[:3] >= '2.6':
     import json
 else:
+    # Because of simplejson's intra-package import statements, the path
+    # of simplejson has to be temporarily add to system path, otherwise 
+    # we will get ImportError when import from the upper level.
+    cur_dir = current_dir(__file__)
+    sys.path.append(cur_dir)
     import simplejson as json
+    sys.path.remove(cur_dir)
 
 #import mon_agent_logger
 from Exceptions import ExecCmdException
@@ -100,9 +110,6 @@ def threadinglize(target_, tName=None, isDaemon_=True):
         t.start()
     return func_
 
-current_dir = lambda f: os.path.dirname(os.path.abspath(f))
-
-parent_dir = lambda f: os.path.dirname(current_dir(f))
 
 def decode(data):
     #return json.loads(data)

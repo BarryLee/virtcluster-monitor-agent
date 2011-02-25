@@ -63,7 +63,6 @@ class DiskModule(MonModule):
         #stats = f.read().strip().split()
         #print stats
         f.close()
-        #self.set_timestamp('diskstats', now)
         if self._update_t == 0:
             self._t_diff = float(open('/proc/uptime').read().split()[0])
         else:

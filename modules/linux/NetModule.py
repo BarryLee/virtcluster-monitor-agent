@@ -64,7 +64,6 @@ class NetModule(MonModule):
                 self._get_report(('last_netdev', 'realbytesin'))
         if not vdiff > 0:
             return 0
-        #tdiff = self.get_timestamp('netdev') - self.get_timestamp('last_netdev')
         tdiff = self._get_time_diff()
         #if tdiff < 1:
             #tdiff = 1
@@ -76,7 +75,6 @@ class NetModule(MonModule):
         if not vdiff > 0:
             return 0
         tdiff = self._get_time_diff()
-        #tdiff = self.get_timestamp('netdev') - self.get_timestamp('last_netdev')
         #if tdiff < 1:
             #tdiff = 1
         return int(vdiff / tdiff)
@@ -87,7 +85,6 @@ class NetModule(MonModule):
         if not vdiff > 0:
             return 0
         tdiff = self._get_time_diff()
-        #tdiff = self.get_timestamp('netdev') - self.get_timestamp('last_netdev')
         #if tdiff < 1:
             #tdiff = 1
         return int(vdiff / tdiff)
@@ -98,7 +95,6 @@ class NetModule(MonModule):
         if not vdiff > 0:
             return 0
         tdiff = self._get_time_diff()
-        #tdiff = self.get_timestamp('netdev') - self.get_timestamp('last_netdev')
         #if tdiff < 1:
             #tdiff = 1
         return int(vdiff / tdiff)
