@@ -3,11 +3,13 @@
 import threading
 import os.path
 import socket
+import xmlrpclib
 from time import sleep
 
 from utils.utils import current_dir, encode, decode, _print
 from utils.load_config import load_config
 from utils.get_logger import get_logger
+from modeler import model
 
 
 logger = get_logger('agent')
@@ -167,13 +169,16 @@ def main():
     f.close()
 
     #_print(metric_conf)
-    host, port = global_config['monitor_server'].split(':')
-    port = int(port)
-    Controller(metric_conf['metric_groups'], host, port).start()
+    server_host, server_port = global_config['monitor_server'].split(':')
+    server_port = int(server_port)
+    rpc_client = xmlrpclib.ServerProxy('http://%s:%d' % (server_host, server_port))
+    retcode, retdata = rpc_client.sign_in(encode(model()))
+    print retcode, retdata
+    #Controller(metric_conf['metric_groups'], server_host, server_port).start()
     
-    while True:
-        _print(threading.enumerate())
-        sleep(60)
+    #while True:
+        #_print(threading.enumerate())
+        #sleep(60)
 
 if __name__ == '__main__':
     #mod = import_module('CPUModule')

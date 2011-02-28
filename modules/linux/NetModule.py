@@ -31,12 +31,12 @@ class NetModule(MonModule):
         super(NetModule, self).update()
 
         rawdata = self._get_rawdata('netdev')
-        for k, v in rawdata.items():
+        for k, v in rawdata.iteritems():
             self._set_report(['netdev', k], [int(i) for i in v.split()], True)
 
         rbi = rbo = rpi = rpo = 0
         report = self._get_report('netdev')
-        for k,v in report.items():
+        for k,v in report.iteritems():
             for i in self._black_list:
                 if re.match(i, k) is not None:
                     continue
