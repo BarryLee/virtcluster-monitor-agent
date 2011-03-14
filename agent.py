@@ -13,7 +13,12 @@ from modeler import model
 
 
 logger = get_logger('agent')
-#logger.critical('test')
+
+
+class AgentException(Exception):
+    pass
+
+
 PLATFORM = 'linux'
 
 def import_module(module_name):
@@ -34,7 +39,7 @@ class Collector(object):
         self.worker = instance
         self.handler = instance.metric_handler
         self.update = instance.update
-        self.object = instance.get_object()
+        self.prefix = instance.get_prefix()
         logger.debug('Collector.__init__: %s, %s' % (self.handler, self.update))
         self.metrics = []
         self.last_collect = 0
@@ -53,11 +58,13 @@ class Collector(object):
     def doCollect(self):
         retval = {}
         self.update()
-        if self.object is not None:
-            retval['object'] = self.object
+        #if self.prefix is not None:
+            #retval['prefix'] = self.prefix
         for metric in self.metrics:
             name = metric['name']
-            retval[name] = self.handler(name)
+            if self.prefix is not None:
+                name = self.prefix + '_' + name
+            retval[name] = self.handler(metric['name'])
         #self.last_collect = time()
         self.last_collect = self.worker.get_update_time()
         retval['timestamp'] = self.last_collect
@@ -157,24 +164,40 @@ class Controller(object):
         self._collectors[cname].append(s) 
         s.start()
 
+
+    #def waitTillDie(self):
+        #for cl in self._collectors.values():
+            #for t in cl:
+                #t.join()
+
     
 def main():
 
     global_config = load_config()
     #_print(global_config)
 
-    metric_conf_file = current_dir(__file__) + os.path.sep + 'metric_conf'
-    f = open(metric_conf_file)
-    metric_conf = decode(f.read())
-    f.close()
+    #metric_conf_file = current_dir(__file__) + os.path.sep + 'metric_conf'
+    #f = open(metric_conf_file)
+    #metric_conf = decode(f.read())
+    #f.close()
 
     #_print(metric_conf)
     server_host, server_port = global_config['monitor_server'].split(':')
     server_port = int(server_port)
     rpc_client = xmlrpclib.ServerProxy('http://%s:%d' % (server_host, server_port))
-    retcode, retdata = rpc_client.sign_in(encode(model()))
-    print retcode, retdata
-    #Controller(metric_conf['metric_groups'], server_host, server_port).start()
+
+    try:
+        retcode, retdata = rpc_client.sign_in(encode(model()))
+        logger.debug('%d\n%s' % (retcode, retdata))
+        assert retcode == 1
+    except Exception, e:
+        logger.exception('')
+        raise AgentException, 'sign_in failed'
+
+    metric_conf = decode(retdata)
+    cont = Controller(metric_conf['metric_groups'], server_host, server_port)
+    cont.start()
+    #cont.waitTillDie()
     
     #while True:
         #_print(threading.enumerate())

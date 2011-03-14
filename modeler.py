@@ -106,7 +106,9 @@ def get_disk_info():
         if device.startswith('/dev/'):
             device = device.rsplit('/', 1)[-1]
         mp_stat = mounts.get_mp_stat(mp)
-        if mp_stat['size'] == 0 or not mounts.is_local_fs(fstype):
+        if mp_stat['size'] == 0 or \
+           not mounts.is_local_fs(fstype) or \
+           device not in part_disk.keys():
             catagory = 'other'
         else:
             catagory = 'local'

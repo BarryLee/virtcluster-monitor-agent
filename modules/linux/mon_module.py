@@ -76,8 +76,6 @@ class MonModule(object):
     def __init__(self):
         self._rawdata = {}
         self._report = {}
-        # _object stands for monitored object(a device name, etc)
-        self._object = None
         #self.info = {}
         self._t_diff = 0
         self._update_t = 0
@@ -158,7 +156,7 @@ class MonModule(object):
         put_to_dict(self._report, keys, val, create)
 
 
-    def get_object(self):
-        return self._object
+    def get_prefix(self):
+        return None
 
 

@@ -39,7 +39,7 @@ class DiskModule(MonModule):
         else:
             self.statsfile = self.statsfile % \
                     (get_partition_disk()[device] + '/' + device)
-        self._object = device
+        self._device = device
         self._report = {}
         self._t_diff = 0
         self._update_t = 0
@@ -74,6 +74,11 @@ class DiskModule(MonModule):
             #self.info['diskstats']['val'][k] = int(stats[i])
             #i += 1
             
+
+    def get_prefix(self):
+        return self._device
+
+
     def _get_stats_diff(self, index):
         return self._report['diskstats'][index] - \
                 self._report['last_diskstats'][index]
@@ -149,8 +154,8 @@ if __name__ == '__main__':
     while True:
         print
         print caption
-        print ('%-9s' + '%9.2f' * 10) % tuple([ins_a._object] + [ins_a.metric_handler(i) for i in m])
-        print ('%-9s' + '%9.2f' * 10) % tuple([ins_b._object] + [ins_b.metric_handler(i) for i in m])
+        print ('%-9s' + '%9.2f' * 10) % tuple([ins_a._device] + [ins_a.metric_handler(i) for i in m])
+        print ('%-9s' + '%9.2f' * 10) % tuple([ins_b._device] + [ins_b.metric_handler(i) for i in m])
         #print ins.info
         #print '%.2f' % ins.metric_handler('util')
         time.sleep(5)

@@ -19,7 +19,7 @@ class NetModule(MonModule):
     }]
 
 
-    def __init__(self, black_list=[]):
+    def __init__(self, black_list=['lo']):
         self._black_list = black_list
         super(NetModule, self).__init__()
 

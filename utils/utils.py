@@ -113,12 +113,35 @@ def threadinglize(target_, tName=None, isDaemon_=True):
 
 def decode(data):
     #return json.loads(data)
-    return eval(data)
+    #return eval(data)
+    return _parseJSON(json.loads(data))
 
 
 def encode(data):
     #return json.dumps(data, sort_keys=True, indent=2)
     return json.dumps(data)
+
+
+# turns unicode back into str
+def _parseJSON(obj):
+    if obj is None:
+        return obj
+    elif type(obj) in (int, float, str, bool):
+        return obj
+    elif type(obj) == unicode:
+        return str(obj)
+    elif type(obj) in (list, tuple, set):
+        obj = list(obj)
+        for i,v in enumerate(obj):
+            obj[i] = _parseJSON(v)
+    elif type(obj) == dict:
+        for i,v in obj.iteritems():
+            obj.pop(i)
+            obj[_parseJSON(i)] = _parseJSON(v)
+    else:
+        print "invalid object in data, converting to string"
+        obj = str(obj) 
+    return obj
 
 
 def exec_cmd(cmd):
