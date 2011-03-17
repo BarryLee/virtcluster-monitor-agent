@@ -21,10 +21,11 @@ class NetModule(MonModule):
 
     def __init__(self, interface='eth0'):
         assert type(interface) in (str, list, tuple)
-        if type(interface) is str:
-            self._interface = interface.lower()
-        elif type(interface) in (list, tuple):
-            self._interface = map(lambda x:x.lower(), interface)
+        #if type(interface) is str:
+            #self._interface = interface.lower()
+        #elif type(interface) in (list, tuple):
+            #self._interface = map(lambda x:x.lower(), interface)
+        self._interface = interface
         #self._black_list = black_list
         super(NetModule, self).__init__()
 
@@ -44,17 +45,17 @@ class NetModule(MonModule):
         report = self._get_report('netdev')
         for k,v in report.iteritems():
             if type(self._interface) is str:
-                if k.lower() == self._interface:
+                if k == self._interface:
             #for i in self._black_list:
                 #if re.match(i, k) is not None:
                     #continue
-                    rbi += v[0]
-                    rpi += v[1]
-                    rbo += v[8]
-                    rpo += v[9]
+                    rbi = v[0]
+                    rpi = v[1]
+                    rbo = v[8]
+                    rpo = v[9]
                     break
             else:
-                if k.lower() in self._interface:
+                if k in self._interface:
                     rbi += v[0]
                     rpi += v[1]
                     rbo += v[8]

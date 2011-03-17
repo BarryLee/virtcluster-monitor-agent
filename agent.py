@@ -32,9 +32,7 @@ class Collector(object):
 
     def __init__(self, mod_name, *args, **kwargs):
         self.mod_name = mod_name
-        #mod = __import__(mod_name)  
         mod = import_module(mod_name)
-        #_print(mod.__name__)
         instance = getattr(mod, mod_name)(*args, **kwargs)
         self.worker = instance
         self.handler = instance.metric_handler
@@ -43,6 +41,7 @@ class Collector(object):
         logger.debug('Collector.__init__: %s, %s' % (self.handler, self.update))
         self.metrics = []
         self.last_collect = 0
+        self.report = {}
     
  
     def setMetricGroup(self, metrics):
@@ -56,15 +55,19 @@ class Collector(object):
 
 
     def doCollect(self):
-        retval = {}
+        retval = self.report
         self.update()
-        #if self.prefix is not None:
-            #retval['prefix'] = self.prefix
         for metric in self.metrics:
             name = metric['name']
-            if self.prefix is not None:
-                name = self.prefix + '_' + name
-            retval[name] = self.handler(metric['name'])
+            val = self.handler(metric['name'])
+            if type(val) is dict:
+                for k, v in val.iteritems():
+                    p_name = k + '_' + name
+                    retval[p_name] = v
+            else:
+                if self.prefix is not None:
+                    name = self.prefix + '_' + name
+                retval[name] = val
         #self.last_collect = time()
         self.last_collect = self.worker.get_update_time()
         retval['timestamp'] = self.last_collect
