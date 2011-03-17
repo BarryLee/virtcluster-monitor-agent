@@ -101,8 +101,8 @@ class Sender(threading.Thread):
 
 
     def _send(self, channel, data):
-        channel[2].sendto(data, (channel[0], channel[1]))
-        #logger.debug(data)
+        #channel[2].sendto(data, (channel[0], channel[1]))
+        logger.debug(data)
 
 
     def run(self):
@@ -199,9 +199,9 @@ def main():
     cont.start()
     #cont.waitTillDie()
     
-    #while True:
-        #_print(threading.enumerate())
-        #sleep(60)
+    while True:
+        _print(threading.enumerate())
+        sleep(60)
 
 if __name__ == '__main__':
     #mod = import_module('CPUModule')
