@@ -7,19 +7,24 @@ import xmlrpclib
 from time import sleep
 
 from utils.utils import current_dir, encode, decode, _print
-from utils.load_config import load_config
+from utils.load_config import load_global_config, load_metric_list
 from utils.get_logger import get_logger
-from modeler import model
+from utils.platform_info import get_platform_info
 
 
 logger = get_logger('agent')
+
+global_config = load_global_config()
+
+PLATFORM = global_config['platform']
+
+# change to the current directory
+#os.chdir(current_dir(__file__))
 
 
 class AgentException(Exception):
     pass
 
-
-PLATFORM = 'linux'
 
 def import_module(module_name):
     #print type(module_name)
@@ -30,18 +35,25 @@ def import_module(module_name):
 
 class Collector(object):
 
-    def __init__(self, mod_name, *args, **kwargs):
+    def __init__(self, mod_name, metric_group, period, *args, **kwargs):
         self.mod_name = mod_name
         mod = import_module(mod_name)
         instance = getattr(mod, mod_name)(*args, **kwargs)
         self.worker = instance
         self.handler = instance.metric_handler
         self.update = instance.update
-        self.prefix = instance.get_prefix()
-        logger.debug('Collector.__init__: %s, %s' % (self.handler, self.update))
+        #self.prefix = instance.get_prefix()
+        #logger.debug('Collector.__init__: %s, %s' % (self.handler, self.update))
+
         self.metrics = []
+        self.setMetricGroup(metric_group)
+        self.setPeriod(period)
+
         self.last_collect = 0
-        self.report = {}
+        self.report = {"timestamp": 0, "val": {}}
+        prefix = instance.get_prefix()
+        if prefix is not None:
+            self.report['prefix'] = prefix
     
  
     def setMetricGroup(self, metrics):
@@ -55,24 +67,17 @@ class Collector(object):
 
 
     def doCollect(self):
-        retval = self.report
+        ret = self.report
+        retval = ret['val']
         self.update()
         for metric in self.metrics:
             name = metric['name']
-            val = self.handler(metric['name'])
-            if type(val) is dict:
-                for k, v in val.iteritems():
-                    p_name = k + '_' + name
-                    retval[p_name] = v
-            else:
-                if self.prefix is not None:
-                    name = self.prefix + '_' + name
-                retval[name] = val
+            retval[name] =self.handler(name)
         #self.last_collect = time()
         self.last_collect = self.worker.get_update_time()
-        retval['timestamp'] = self.last_collect
+        ret['timestamp'] = self.last_collect
         #logger.debug('doCollect:%s' % (retval,)) 
-        return retval
+        return ret
 
 
 
@@ -115,21 +120,14 @@ class Sender(threading.Thread):
                 self.collectAndSend()
             except Exception, e:
                 logger.exception('Oops, error occured')
-                #Monitor.RUNNING = False
             else:
-                #Monitor.RUNNING = True
                 while self.CONT_FLAG:
                     sleep(self._interval)
                     try:
                         self.collectAndSend()
                     except Exception, e:
                         logger.exception('')
-                        #Monitor.RUNNING = False
-                        #break
                         raise
-                    #self.cond.acquire()
-                    # block until next collect
-                    #self.cond.wait(self._interval)  
 
 
 
@@ -148,15 +146,28 @@ class Controller(object):
     def start(self):
         for metric_group in self._metric_groups:
             modname = metric_group['name']
-            if metric_group.has_key('args'):
-                args = metric_group['args']
+            if metric_group.has_key('instances'):
+                for args in metric_group['instances']:
+                    collector = Collector(modname, 
+                                          metric_group["metrics"], 
+                                          metric_group["period"], 
+                                          **args)
+                    #collector.setMetricGroup(metric_group["metrics"])
+                    #collector.setPeriod(metric_group["period"])
+                    self.loadCollector(modname, collector)
+                    sleep(1)
+            #if metric_group.has_key('args'):
+                #args = metric_group['args']
+            #else:
+                #args = {}
             else:
-                args = {}
-            collector = Collector(modname, **args)
-            collector.setMetricGroup(metric_group["metrics"])
-            collector.setPeriod(metric_group["period"])
-            self.loadCollector(modname, collector)
-            sleep(1)
+                collector = Collector(modname, 
+                                      metric_group["metrics"], 
+                                      metric_group["period"])
+                #collector.setMetricGroup(metric_group["metrics"])
+                #collector.setPeriod(metric_group["period"])
+                self.loadCollector(modname, collector)
+                sleep(1)
 
 
     def loadCollector(self, cname, cinstance):
@@ -176,30 +187,24 @@ class Controller(object):
     
 def main():
 
-    global_config = load_config()
-    #_print(global_config)
+    platforminfo = get_platform_info()
+    metric_list = load_metric_list()
+    platforminfo.update(metric_list)
 
-    #metric_conf_file = current_dir(__file__) + os.path.sep + 'metric_conf'
-    #f = open(metric_conf_file)
-    #metric_conf = decode(f.read())
-    #f.close()
-
-    #_print(metric_conf)
     server_host, server_port = global_config['monitor_server'].split(':')
     server_port = int(server_port)
     rpc_client = xmlrpclib.ServerProxy('http://%s:%d' % (server_host, server_port))
 
     try:
-        retcode, retdata = rpc_client.sign_in(encode(model()))
-        logger.debug('%d\n%s' % (retcode, retdata))
+        retcode = rpc_client.sign_in(encode(platforminfo))
         assert retcode == 1
     except Exception, e:
         logger.exception('')
         raise AgentException, 'sign_in failed'
 
-    metric_conf = decode(retdata)
-    cont = Controller(metric_conf['metric_groups'], server_host, server_port)
-    cont.start()
+    #metric_list = decode(retdata)
+    controller = Controller(metric_list['metric_groups'], server_host, server_port)
+    controller.start()
     #cont.waitTillDie()
     
     while True:

@@ -19,13 +19,13 @@ class NetModule(MonModule):
     }]
 
 
-    def __init__(self, interface='eth0'):
-        assert type(interface) in (str, list, tuple)
-        #if type(interface) is str:
-            #self._interface = interface.lower()
-        #elif type(interface) in (list, tuple):
-            #self._interface = map(lambda x:x.lower(), interface)
-        self._interface = interface
+    def __init__(self, device='eth0'):
+        assert type(device) in (str, list, tuple)
+        #if type(device) is str:
+            #self._device = device.lower()
+        #elif type(device) in (list, tuple):
+            #self._device = map(lambda x:x.lower(), device)
+        self._device = device
         #self._black_list = black_list
         super(NetModule, self).__init__()
 
@@ -44,8 +44,8 @@ class NetModule(MonModule):
         rbi = rbo = rpi = rpo = 0
         report = self._get_report('netdev')
         for k,v in report.iteritems():
-            if type(self._interface) is str:
-                if k == self._interface:
+            if type(self._device) is str:
+                if k == self._device:
             #for i in self._black_list:
                 #if re.match(i, k) is not None:
                     #continue
@@ -55,7 +55,7 @@ class NetModule(MonModule):
                     rpo = v[9]
                     break
             else:
-                if k in self._interface:
+                if k in self._device:
                     rbi += v[0]
                     rpi += v[1]
                     rbo += v[8]
@@ -120,8 +120,8 @@ class NetModule(MonModule):
 
 
     def get_prefix(self):
-        if type(self._interface) is str:
-            return self._interface
+        if type(self._device) is str:
+            return self._device
         else:
             return None
 

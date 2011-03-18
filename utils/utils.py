@@ -117,8 +117,9 @@ def decode(data):
     return _parseJSON(json.loads(data))
 
 
-def encode(data):
-    #return json.dumps(data, sort_keys=True, indent=2)
+def encode(data, pretty=False):
+    if pretty:
+        return json.dumps(data, sort_keys=True, indent=2)
     return json.dumps(data)
 
 
