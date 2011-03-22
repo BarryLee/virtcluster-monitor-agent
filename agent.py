@@ -109,8 +109,8 @@ class Sender(threading.Thread):
 
 
     def _send(self, channel, data):
-        #channel[2].sendto(data, (channel[0], channel[1]))
-        logger.debug(data)
+        channel[2].sendto(data, (channel[0], channel[1]))
+        #logger.debug(data)
 
 
     def run(self):
@@ -191,9 +191,9 @@ def main():
     metric_list = load_metric_list()
     platforminfo.update(metric_list)
 
-    server_host, server_port = global_config['monitor_server'].split(':')
-    server_port = int(server_port)
-    rpc_client = xmlrpclib.ServerProxy('http://%s:%d' % (server_host, server_port))
+    mserver_host, mserver_port = global_config['monitor_server'].split(':')
+    mserver_port = int(mserver_port)
+    rpc_client = xmlrpclib.ServerProxy('http://%s:%d' % (mserver_host, mserver_port))
 
     try:
         retcode = rpc_client.sign_in(encode(platforminfo))
@@ -203,7 +203,9 @@ def main():
         raise AgentException, 'sign_in failed'
 
     #metric_list = decode(retdata)
-    controller = Controller(metric_list['metric_groups'], server_host, server_port)
+    dserver_host, dserver_port = global_config['data_server'].split(':')
+    dserver_port = int(dserver_port)
+    controller = Controller(metric_list['metric_groups'], dserver_host, dserver_port)
     controller.start()
     #cont.waitTillDie()
     
