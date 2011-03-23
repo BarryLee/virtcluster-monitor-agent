@@ -4,6 +4,8 @@ import threading
 import os.path
 import socket
 import xmlrpclib
+import sys
+
 from time import sleep
 
 from utils.utils import current_dir, encode, decode, _print
@@ -12,11 +14,11 @@ from utils.get_logger import get_logger
 from utils.platform_info import get_platform_info
 
 
-logger = get_logger('agent')
+logger = get_logger("agent")
 
 global_config = load_global_config()
 
-PLATFORM = global_config['platform']
+PLATFORM = global_config["platform"]
 
 # change to the current directory
 #os.chdir(current_dir(__file__))
@@ -28,9 +30,9 @@ class AgentException(Exception):
 
 def import_module(module_name):
     #print type(module_name)
-    temp = __import__('modules.' + PLATFORM, globals(), locals(), [module_name,])
+    temp = __import__("modules." + PLATFORM, globals(), locals(), [module_name,])
     return getattr(temp, module_name)
-    #return __import__('.'.join(('modules', PLATFORM, module_name)))
+    #return __import__(".".join(("modules", PLATFORM, module_name)))
 
 
 class Collector(object):
@@ -43,7 +45,7 @@ class Collector(object):
         self.handler = instance.metric_handler
         self.update = instance.update
         #self.prefix = instance.get_prefix()
-        #logger.debug('Collector.__init__: %s, %s' % (self.handler, self.update))
+        #logger.debug("Collector.__init__: %s, %s" % (self.handler, self.update))
 
         self.metrics = []
         self.setMetricGroup(metric_group)
@@ -53,7 +55,7 @@ class Collector(object):
         self.report = {"timestamp": 0, "val": {}}
         prefix = instance.get_prefix()
         if prefix is not None:
-            self.report['prefix'] = prefix
+            self.report["prefix"] = prefix
     
  
     def setMetricGroup(self, metrics):
@@ -68,15 +70,15 @@ class Collector(object):
 
     def doCollect(self):
         ret = self.report
-        retval = ret['val']
+        retval = ret["val"]
         self.update()
         for metric in self.metrics:
-            name = metric['name']
+            name = metric["name"]
             retval[name] =self.handler(name)
         #self.last_collect = time()
         self.last_collect = self.worker.get_update_time()
-        ret['timestamp'] = self.last_collect
-        #logger.debug('doCollect:%s' % (retval,)) 
+        ret["timestamp"] = self.last_collect
+        #logger.debug("doCollect:%s" % (retval,)) 
         return ret
 
 
@@ -116,17 +118,17 @@ class Sender(threading.Thread):
     def run(self):
         if self.CONT_FLAG:
             try:
-                logger.debug('%s start working...' % self.getName())
+                logger.debug("%s start working..." % self.getName())
                 self.collectAndSend()
             except Exception, e:
-                logger.exception('Oops, error occured')
+                logger.exception("Oops, error occured")
             else:
                 while self.CONT_FLAG:
                     sleep(self._interval)
                     try:
                         self.collectAndSend()
                     except Exception, e:
-                        logger.exception('')
+                        logger.exception("")
                         raise
 
 
@@ -145,9 +147,9 @@ class Controller(object):
 
     def start(self):
         for metric_group in self._metric_groups:
-            modname = metric_group['name']
-            if metric_group.has_key('instances'):
-                for args in metric_group['instances']:
+            modname = metric_group["name"]
+            if metric_group.has_key("instances"):
+                for args in metric_group["instances"]:
                     collector = Collector(modname, 
                                           metric_group["metrics"], 
                                           metric_group["period"], 
@@ -156,8 +158,8 @@ class Controller(object):
                     #collector.setPeriod(metric_group["period"])
                     self.loadCollector(modname, collector)
                     sleep(1)
-            #if metric_group.has_key('args'):
-                #args = metric_group['args']
+            #if metric_group.has_key("args"):
+                #args = metric_group["args"]
             #else:
                 #args = {}
             else:
@@ -191,30 +193,44 @@ def main():
     metric_list = load_metric_list()
     platforminfo.update(metric_list)
 
-    mserver_host, mserver_port = global_config['monitor_server'].split(':')
+    mserver_host, mserver_port = global_config["monitor_server"].split(":")
     mserver_port = int(mserver_port)
-    rpc_client = xmlrpclib.ServerProxy('http://%s:%d' % (mserver_host, mserver_port))
+    rpc_client = xmlrpclib.ServerProxy("http://%s:%d" % (mserver_host, mserver_port))
 
     try:
-        retcode = rpc_client.sign_in(encode(platforminfo))
+        retcode = rpc_client.signIn(encode(platforminfo))
         assert retcode == 1
+        logger.info("signed in on server %s:%d" % (mserver_host, mserver_port))
     except Exception, e:
-        logger.exception('')
-        raise AgentException, 'sign_in failed'
+        logger.exception("")
+        raise AgentException, "sign in on %s:%d failed" % (mserver_host, mserver_port)
 
     #metric_list = decode(retdata)
-    dserver_host, dserver_port = global_config['data_server'].split(':')
+    dserver_host, dserver_port = global_config["data_server"].split(":")
     dserver_port = int(dserver_port)
-    controller = Controller(metric_list['metric_groups'], dserver_host, dserver_port)
+    controller = Controller(metric_list["metric_groups"], dserver_host, dserver_port)
     controller.start()
+    logger.info("start sending to server %s:%d" % (dserver_host, dserver_port))
     #cont.waitTillDie()
     
+    retry = 2
     while True:
-        _print(threading.enumerate())
+        #_print(threading.enumerate())
+        try:
+            rpc_client.howru()
+            retry = 2
+        except socket.error, e:
+            logger.exception("")
+            if retry > 0:
+                retry -= 1
+                logger.warning("cannot connnect to server, %d time to go" % retry)
+            else:
+                logger.error("server is down, exit now")
+                sys.exit(1)
         sleep(60)
 
-if __name__ == '__main__':
-    #mod = import_module('CPUModule')
+if __name__ == "__main__":
+    #mod = import_module("CPUModule")
     #print mod
     main()
    
