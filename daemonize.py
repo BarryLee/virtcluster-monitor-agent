@@ -58,9 +58,9 @@ def deamonize(stdout='/dev/null', stderr=None, stdin='/dev/null',
     
     # Open file descriptors and print start message
     if not stderr: stderr = stdout
-    si = file(stdin, 'r')
-    so = file(stdout, 'a+')
-    se = file(stderr, 'a+', 0)
+    si = not hasattr(stdin, 'fileno') and file(stdin, 'r') or stdin
+    so = not hasattr(stdout, 'fileno') and file(stdout, 'a+') or stdout
+    se = not hasattr(stderr, 'fileno') and file(stderr, 'a+', 0) or stderr
     pid = str(os.getpid())
     sys.stderr.write("\n%s\n" % startmsg % pid)
     sys.stderr.flush()
@@ -72,7 +72,8 @@ def deamonize(stdout='/dev/null', stderr=None, stdin='/dev/null',
     os.dup2(se.fileno(), sys.stderr.fileno())
 
 def startstop(stdout='/dev/null', stderr=None, stdin='/dev/null',
-              pidfile='pid.txt', startmsg = 'started with pid %s' ):
+              pidfile='pid.txt', startmsg = 'started with pid %s',
+              on_exit=None, *on_exit_args):
     if len(sys.argv) > 1:
         action = sys.argv[1]
         try:
@@ -90,20 +91,22 @@ def startstop(stdout='/dev/null', stderr=None, stdin='/dev/null',
                 else:
                     sys.exit(1)
             try:
-               while 1 and 'start' != action:
-                   os.kill(pid,SIGTERM)
-                   time.sleep(1)
+                if on_exit is not None:
+                    on_exit(*on_exit_args)
+                while 1 and 'start' != action:
+                    os.kill(pid,SIGTERM)
+                    time.sleep(1)
             except OSError, err:
-               err = str(err)
-               if err.find("No such process") > 0:
-                   os.remove(pidfile)
-                   if 'stop' == action:
+                err = str(err)
+                if err.find("No such process") > 0:
+                    os.remove(pidfile)
+                    if 'stop' == action:
                        sys.exit(0)
-                   action = 'start'
-                   pid = None
-               else:
-                   print str(err)
-                   sys.exit(1)
+                    action = 'start'
+                    pid = None
+                else:
+                    print str(err)
+                    sys.exit(1)
         if 'start' == action:
             if pid:
                 mess = "Start aborded since pid file '%s' exists.\n"

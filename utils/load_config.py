@@ -40,8 +40,9 @@ def load_metric_list():
     except Exception, e:
         def handle_device(device, metric_group, unmonitored_list):
             if device not in unmonitored_list:
-                if not metric_group.has_key('instances'):
-                    metric_group['instances'] = []
+                metric_group.setdefault('instances', [])
+                #if not metric_group.has_key('instances'):
+                    #metric_group['instances'] = []
                 metric_group['instances'].append({'device': device})
 
         from platform_info import get_network_info

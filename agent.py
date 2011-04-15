@@ -175,8 +175,9 @@ class Controller(object):
     def loadCollector(self, cname, cinstance):
         # start this collector now
         s = Sender(cinstance, self._channel)
-        if not self._collectors.has_key(cname):
-            self._collectors[cname] = []
+        self._collectors.setdefault(cname, [])
+        #if not self._collectors.has_key(cname):
+            #self._collectors[cname] = []
         self._collectors[cname].append(s) 
         s.start()
 

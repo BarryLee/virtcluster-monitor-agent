@@ -123,9 +123,10 @@ def get_disk_info():
         # skip disk
         #if not partname[-1].isdigit() or partname.startswith('loop'):
             #continue
-        if not disk['local'].has_key(partname):
-            disk['local'][partname] = {}
-            disk['local'][partname]['size'] = int(partinfo[2])
+        disk['local'].setdefault(partname, {'size': int(partinfo[2])})
+        #if not disk['local'].has_key(partname):
+            #disk['local'][partname] = {}
+            #disk['local'][partname]['size'] = int(partinfo[2])
 
         if part_disk.has_key(partname):
             disk['local'][partname]['disk'] = part_disk.get(partname)

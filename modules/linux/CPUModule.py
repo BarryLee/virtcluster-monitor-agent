@@ -35,8 +35,9 @@ class CPUModule(MonModule):
             totalTime += int(elem)
         self._report['stat']['cpu_total_jiffies'] = totalTime
         
-        if not self._report.has_key('last_stat'):  # first run
-            self._report['last_stat'] = self._report['stat']
+        self._report.setdefault('last_stat', self._report['stat'])
+        #if not self._report.has_key('last_stat'):  # first run
+            #self._report['last_stat'] = self._report['stat']
 
         self.total_jiffies_diff = self._report['stat']['cpu_total_jiffies'] - \
                 self._report['last_stat']['cpu_total_jiffies']

@@ -66,8 +66,9 @@ class NetModule(MonModule):
         self._set_report(('netdev', 'realpacketsin'), rpi, True)
         self._set_report(('netdev', 'realpacketsout'), rpo, True)
 
-        if not self._report.has_key('last_netdev'):
-            self._report['last_netdev'] = self._report['netdev']
+        self._report.setdefault('last_netdev', self._report['netdev'])
+        #if not self._report.has_key('last_netdev'):
+            #self._report['last_netdev'] = self._report['netdev']
 
 
     def _get_time_diff(self):
