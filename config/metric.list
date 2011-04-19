@@ -140,20 +140,17 @@
         {
           "enabled": 1, 
           "name": "load_one", 
-          "title": "load one", 
-          "unit": "pct"
+          "title": "load one"
         }, 
         {
           "enabled": 1, 
           "name": "load_five", 
-          "title": "load five", 
-          "unit": "pct"
+          "title": "load five"
         }, 
         {
           "enabled": 1, 
           "name": "load_fifteen", 
-          "title": "load fifteen", 
-          "unit": "pct"
+          "title": "load fifteen"
         }
       ], 
       "name": "LoadModule", 
@@ -262,7 +259,8 @@
         }, 
         {
           "enabled": 1, 
-          "name": "util"
+          "name": "util", 
+          "unit": "pct"
         }, 
         {
           "enabled": 1, 
