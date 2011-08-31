@@ -44,7 +44,6 @@ class Collector(object):
         self.worker = instance
         self.handler = instance.metric_handler
         self.update = instance.update
-        #self.prefix = instance.get_prefix()
         #logger.debug("Collector.__init__: %s, %s" % (self.handler, self.update))
 
         self.metrics = []
@@ -53,9 +52,10 @@ class Collector(object):
 
         self.last_collect = 0
         self.report = {"timestamp": 0, "val": {}}
-        prefix = instance.get_prefix()
-        if prefix is not None:
-            self.report["prefix"] = prefix
+        self.report['module'] = mod_name
+        device = instance.get_device()
+        if device is not None:
+            self.report["device"] = device
     
  
     def setMetricGroup(self, metrics):

@@ -234,13 +234,13 @@
         }, 
         {
           "enabled": 1, 
-          "name": "rkbps", 
-          "title": "rkb/s"
+          "name": "rkBps", 
+          "title": "rkB/s"
         }, 
         {
           "enabled": 1, 
-          "name": "wkbps", 
-          "title": "wkb/s"
+          "name": "wkBps", 
+          "title": "wkB/s"
         }, 
         {
           "enabled": 1, 

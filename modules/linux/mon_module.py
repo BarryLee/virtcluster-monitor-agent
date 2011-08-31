@@ -73,13 +73,13 @@ class MonModule(object):
     '''monitor moudle'''
 
 
-    def __init__(self):
+    def __init__(self, device=None):
+        self._device = device
         self._rawdata = {}
         self._report = {}
         #self.info = {}
         self._t_diff = 0
         self._update_t = 0
-        self.metric_init()
 
 
     def metric_init(self):
@@ -156,7 +156,7 @@ class MonModule(object):
         put_to_dict(self._report, keys, val, create)
 
 
-    def get_prefix(self):
-        return None
+    def get_device(self):
+        return self._device 
 
 

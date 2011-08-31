@@ -15,8 +15,8 @@ metric_list = [
     'wrqmps',
     'rsecps',
     'wsecps',
-    'rkbps',
-    'wkbps',
+    'rkBps',
+    'wkBps',
     'util',
     'await',
     'avgrq_sz',
@@ -73,10 +73,6 @@ class DiskModule(MonModule):
         #for k in self.rels:
             #self.info['diskstats']['val'][k] = int(stats[i])
             #i += 1
-            
-
-    def get_prefix(self):
-        return self._device
 
 
     def _get_stats_diff(self, index):
@@ -114,10 +110,10 @@ class DiskModule(MonModule):
     def get_wsecps(self):
         return self._get_stats_diff(6) / self._t_diff
         
-    def get_rkbps(self):
+    def get_rkBps(self):
         return self.get_rsecps() * self.sec_sz
 
-    def get_wkbps(self):
+    def get_wkBps(self):
         return self.get_wsecps() * self.sec_sz
 
     def get_util(self):
@@ -148,7 +144,7 @@ if __name__ == '__main__':
     ins_a = DiskModule('sda')
     ins_b = DiskModule('sdb')
     rels = ('Device:', 'rrqm/s', 'wrqm/s', 'r/s', 'w/s', 'rkB/s', 'wkB/s', 'avgrq-sz', 'avgqu-sz', 'await', '%util')
-    m = ('rrqmps', 'wrqmps', 'rps', 'wps', 'rkbps', 'wkbps', 'avgrq_sz', 'avgqu_sz', 'await', 'util')
+    m = ('rrqmps', 'wrqmps', 'rps', 'wps', 'rkBps', 'wkBps', 'avgrq_sz', 'avgqu_sz', 'await', 'util')
     caption = ('%-9s' +'%9s' * 10) % rels
 
     while True:

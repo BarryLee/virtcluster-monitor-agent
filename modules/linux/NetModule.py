@@ -20,14 +20,7 @@ class NetModule(MonModule):
 
 
     def __init__(self, device='eth0'):
-        assert type(device) in (str, list, tuple)
-        #if type(device) is str:
-            #self._device = device.lower()
-        #elif type(device) in (list, tuple):
-            #self._device = map(lambda x:x.lower(), device)
-        self._device = device
-        #self._black_list = black_list
-        super(NetModule, self).__init__()
+        super(NetModule, self).__init__(device)
 
 
     def update(self):
@@ -120,7 +113,7 @@ class NetModule(MonModule):
         return int(vdiff / tdiff)
 
 
-    def get_prefix(self):
+    def get_device(self):
         if type(self._device) is str:
             return self._device
         else:
