@@ -52,7 +52,6 @@ class Collector(object):
 
         self.last_collect = 0
         self.report = {"timestamp": 0, "val": {}}
-        self.report['module'] = mod_name
         device = instance.get_device()
         if device is not None:
             self.report["device"] = device
