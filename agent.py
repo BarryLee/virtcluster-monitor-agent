@@ -7,8 +7,9 @@ import xmlrpclib
 import sys
 
 from time import sleep
+from SimpleXMLRPCServer import SimpleXMLRPCServer
 
-from utils.utils import current_dir, encode, decode, _print
+from utils.utils import current_dir, encode, decode, _print, threadinglize
 from utils.load_config import load_global_config, load_metric_list
 from utils.get_logger import get_logger
 from utils.platform_info import get_platform_info
@@ -198,21 +199,25 @@ def main():
     rpc_client = xmlrpclib.ServerProxy("http://%s:%d" % (mserver_host, mserver_port))
 
     try:
-        retcode = rpc_client.signIn(encode(platforminfo))
-        assert retcode == 1
-        logger.info("signed in on server %s:%d" % (mserver_host, mserver_port))
+        retcode, myid = rpc_client.register(encode(platforminfo))
+        assert retcode
+        logger.info("registered on server %s:%d" % (mserver_host, mserver_port))
     except Exception, e:
-        logger.exception("")
-        raise AgentException, "sign in on %s:%d failed" % (mserver_host, mserver_port)
+        logger.exception(myid)
+        raise AgentException, "register on %s:%d failed" % (mserver_host, mserver_port)
 
     #metric_list = decode(retdata)
     dserver_host, dserver_port = global_config["data_server"].split(":")
     dserver_port = int(dserver_port)
     controller = Controller(metric_list["metric_groups"], dserver_host, dserver_port)
+    #cont.waitTillDie()
+    server = SimpleXMLRPCServer(('0.0.0.0', int(global_config['port'])))
+    server.register_instance(controller)
+    threadinglize(server.serve_forever)()
+
     controller.start()
     logger.info("start sending to server %s:%d" % (dserver_host, dserver_port))
-    #cont.waitTillDie()
-    
+
     retry = 2
     while True:
         #_print(threading.enumerate())
