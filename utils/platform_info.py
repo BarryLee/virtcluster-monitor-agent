@@ -23,7 +23,7 @@ xentop_path = config.get('xentop_path')
 def get_platform_info():
 
     host = {}
-    host['virtual'] = 0
+    host['is_virtual'] = config.as_bool('is_virtual')
     host['virt_type'] = get_virt_type()
     host['components'] = {}
     host['components']['cpu'] = get_cpu_info()
@@ -66,11 +66,11 @@ def get_virt_type():
     if os.path.exists(XEN_PROC):
         return XEN_VIRTTYPE
     else:
-        return None
+        return ''
 
 def get_mem_info():
     t = get_virt_type()
-    if t is None:
+    if t == '' :
         return get_phy_mem_info()
     else:
         return eval('get_%s_mem_info()' % t)

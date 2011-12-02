@@ -116,6 +116,7 @@ class Sender(threading.Thread):
 
 
     def run(self):
+        self.CONT_FLAG = True
         if self.CONT_FLAG:
             try:
                 logger.debug("%s start working..." % self.getName())
@@ -146,6 +147,7 @@ class Controller(object):
 
 
     def start(self):
+        logger.info("starting controller...")
         for metric_group in self._metric_groups:
             modname = metric_group["name"]
             if metric_group.has_key("instances"):
@@ -182,60 +184,94 @@ class Controller(object):
         s.start()
 
 
+    def stop(self):
+        logger.info("stopping controller...")
+        for modname, senderlist in self._collectors.items():
+            for sender in senderlist:
+                sender.stop()
+        self._collectors.clear()
+
     #def waitTillDie(self):
         #for cl in self._collectors.values():
             #for t in cl:
                 #t.join()
 
+class Agent(object):
+
+    def __init__(self, config):
+        # init the controller
+        self.metric_list = load_metric_list()
+        dserver_host, dserver_port = config["data_server"].split(":")
+        dserver_port = int(dserver_port)
+        self.controller = Controller(self.metric_list["metric_groups"], dserver_host, dserver_port)
+        self.dataserver = (dserver_host, dserver_port)
+        # create a rpc client
+        mserver_host, mserver_port = config["monitor_server"].split(":")
+        mserver_port = int(mserver_port)
+        self.rpc_client = xmlrpclib.ServerProxy("http://%s:%d" % (mserver_host, mserver_port))
+        self.monserver = (mserver_host, mserver_port)
+        
+        self.retry = config.as_int('retry')
+        self.retry_interval = config.as_int('retry_interval')
+        self.config = config
+
+        self.start()
+        
+    def start(self):
+        self.register()
+        self.controller.start()
+        threadinglize(self.checkAlive)()
+        return True
+
+    def stop(self):
+        self.controller.stop()
+        return True
     
-def main():
+    def restart(self):
+        if self.stop():
+            return self.start()
+        else:
+            return False
 
-    platforminfo = get_platform_info()
-    metric_list = load_metric_list()
-    platforminfo.update(metric_list)
+    def register(self):
+        platforminfo = get_platform_info()
+        platforminfo.update(self.metric_list)
+        platforminfo['port'] = self.config.as_int('port')
 
-    mserver_host, mserver_port = global_config["monitor_server"].split(":")
-    mserver_port = int(mserver_port)
-    rpc_client = xmlrpclib.ServerProxy("http://%s:%d" % (mserver_host, mserver_port))
-
-    try:
-        retcode, myid = rpc_client.register(encode(platforminfo))
-        assert retcode
-        logger.info("registered on server %s:%d" % (mserver_host, mserver_port))
-    except Exception, e:
-        logger.exception(myid)
-        raise AgentException, "register on %s:%d failed" % (mserver_host, mserver_port)
-
-    #metric_list = decode(retdata)
-    dserver_host, dserver_port = global_config["data_server"].split(":")
-    dserver_port = int(dserver_port)
-    controller = Controller(metric_list["metric_groups"], dserver_host, dserver_port)
-    #cont.waitTillDie()
-    server = SimpleXMLRPCServer(('0.0.0.0', int(global_config['port'])))
-    server.register_instance(controller)
-    threadinglize(server.serve_forever)()
-
-    controller.start()
-    logger.info("start sending to server %s:%d" % (dserver_host, dserver_port))
-
-    retry = 2
-    while True:
-        #_print(threading.enumerate())
         try:
-            rpc_client.howru()
-            retry = 2
-        except socket.error, e:
-            logger.exception("")
-            if retry > 0:
-                retry -= 1
-                logger.warning("cannot connnect to server, %d time to go" % retry)
-            else:
-                logger.error("server is down, exit now")
-                sys.exit(1)
-        sleep(60)
+            retcode, myid = self.rpc_client.register(encode(platforminfo))
+            assert retcode
+            logger.info("registered on server %s:%d" % self.monserver)
+        except Exception, e:
+            logger.exception('')
+            raise AgentException, "register on %s:%d failed" % self.monserver
+
+    def checkAlive(self):
+        retry = self.retry
+        while True:
+            try:
+                self.rpc_client.howru()
+                retry = self.retry
+            except socket.error, e:
+                logger.exception('')
+                if retry > 0:
+                    retry -= 1
+                    logger.warning("cannot connnect to server, %d time to go" % retry)
+                else:
+                    logger.error("server is down, stop sending now")
+                    self.controller.stop()
+                    break
+                    #sys.exit(1)
+            sleep(self.retry_interval)
+
 
 if __name__ == "__main__":
     #mod = import_module("CPUModule")
     #print mod
-    main()
+    #main()
+    agent = Agent(global_config)
+    server = SimpleXMLRPCServer(('0.0.0.0', global_config.as_int('port')))
+    server.register_instance(agent)
+    server.serve_forever()
+    
    
