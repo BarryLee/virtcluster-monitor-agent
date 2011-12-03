@@ -1,3 +1,5 @@
+import os
+
 from monagent.modules.linux.MemModule import MemModule
 from monagent.utils.XenBroker import get_mem_total, get_mem_free, get_total_domU_memory
 
@@ -14,8 +16,8 @@ metric_list = [
     #'mem_available'
 ]
 
-xm_path = '/usr/sbin/xm'
-xentop_path = '/usr/sbin/xentop'
+xm_path = os.environ['xm_path']
+xentop_path = os.environ['xentop_path']
 
 class XenMemModule(MemModule):
 

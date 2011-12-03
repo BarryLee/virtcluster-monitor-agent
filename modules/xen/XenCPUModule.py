@@ -11,8 +11,8 @@ metric_list = [
     'cpu_idle'
 ]
 
-xm_path = '/usr/sbin/xm'
-xentop_path = '/usr/sbin/xentop'
+xm_path = os.environ['xm_path']
+xentop_path = os.environ['xentop_path']
 
 class XenCPUModule(MonModule):
 
