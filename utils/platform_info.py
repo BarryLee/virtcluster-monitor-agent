@@ -54,7 +54,7 @@ def get_cpu_info():
     elif AMD_VT_FLAG in flags:
         cpu['vt_support'] = AMD_VT
     else:
-        cpu['vt_support'] = None
+        cpu['vt_support'] = 'n/a'
 
     cpu['cache_size'] = processorinfo['cache size']
 
