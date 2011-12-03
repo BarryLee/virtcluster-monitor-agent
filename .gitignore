@@ -5,4 +5,4 @@
 *.bak*
 test/*
 config/metric.list
-
+config/agent.conf
