@@ -1,0 +1,16 @@
+
+default_list = 'config/metric.list.default'
+
+# use either black_list or white_list. When both are present, 
+# white_list is ignored.
+
+[disk]
+# disk module settings
+enable_partitions = 0
+black_list = ,
+
+[network]
+# network module settings
+total = 'eth0',
+black_list = 'lo', 'eth\d+', 'wlan\d+'
+#white_list = 'eth\d+',
