@@ -14,7 +14,6 @@ config_dir = parent_dir(__file__) + os.path.sep + 'config'
 GLOBAL_CONFIG = config_dir + os.path.sep + 'agent.conf'
 METRIC_CONFIG = config_dir + os.path.sep + 'metric.conf'
 METRIC_LIST = config_dir + os.path.sep + 'metric.list'
-DEFAULT_METRIC_LIST = config_dir + os.path.sep + 'metric.list.default'
 
 #print GLOBAL_CONFIG
 
@@ -61,7 +60,9 @@ def load_metric_list():
 
         metric_conf = load_config(METRIC_CONFIG)
         #df = open(metric_conf['default_list'])
-        df = open(DEFAULT_METRIC_LIST)
+        default_list_path = parent_dir(__file__) + os.path.sep \
+                        + metric_conf.get('default_list')
+        df = open(default_list_path)
         default_list = decode(df.read())
         df.close()
         

@@ -1,0 +1,293 @@
+{
+  "metric_groups": [
+    {
+      "consolidation_intervals": [
+        60, 
+        600, 
+        900, 
+        1800, 
+        3600
+      ], 
+      "metrics": [
+        {
+          "enabled": 1, 
+          "name": "cpu_idle", 
+          "title": "CPU idle", 
+          "unit": "pct"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "cpu_usage", 
+          "title": "CPU usage", 
+          "unit": "pct"
+        } 
+      ], 
+      "name": "XenCPUModule", 
+      "period": 15
+    }, 
+    {
+      "consolidation_intervals": [
+        60, 
+        600, 
+        900, 
+        1800, 
+        3600
+      ], 
+      "metrics": [
+        {
+          "enabled": 1, 
+          "name": "mem_used", 
+          "title": "mem used", 
+          "unit": "kB"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "mem_usage", 
+          "title": "mem usage", 
+          "unit": "pct"
+        } 
+      ], 
+      "name": "XenMemModule", 
+      "period": 15
+    }, 
+    {
+      "consolidation_intervals": [
+        60, 
+        600, 
+        900, 
+        1800, 
+        3600
+      ], 
+      "metrics": [
+        {
+          "enabled": 1, 
+          "name": "bytes_in", 
+          "title": "bytes in", 
+          "unit": "B/s"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "bytes_out", 
+          "title": "bytes out", 
+          "unit": "B/s"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "packets_in", 
+          "title": "packets in", 
+          "unit": "pkt/s"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "packets_out", 
+          "title": "packets out", 
+          "unit": "pkt/s"
+        }
+      ], 
+      "name": "NetModule", 
+      "period": 15
+    },
+    {
+      "consolidation_intervals": [
+        60, 
+        600, 
+        900, 
+        1800, 
+        3600
+      ], 
+      "metrics": [
+        {
+          "enabled": 1, 
+          "name": "rps", 
+          "title": "r/s"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "wps", 
+          "title": "w/s"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "rrqmps", 
+          "title": "rrqm/s"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "wrqmps", 
+          "title": "wrqm/s"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "rsecps", 
+          "title": "rsec/s"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "wsecps", 
+          "title": "wsec/s"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "rkBps", 
+          "title": "rkB/s"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "wkBps", 
+          "title": "wkB/s"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "util",
+          "unit": "pct"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "await", 
+          "unit": "ms"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "avgrq_sz", 
+          "title": "avgrq-sz"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "avgqu_sz", 
+          "title": "avgqu-sz"
+        }
+      ], 
+      "name": "DiskModule", 
+      "period": 15
+    },
+    {
+      "consolidation_intervals": [
+        60, 
+        600, 
+        900, 
+        1800, 
+        3600
+      ], 
+      "metrics": [
+        {
+          "enabled": 1, 
+          "name": "dom0_cpu_user", 
+          "title": "dom0 CPU user", 
+          "unit": "pct"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "dom0_cpu_nice", 
+          "title": "dom0 CPU nice", 
+          "unit": "pct"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "dom0_cpu_system", 
+          "title": "dom0 CPU system", 
+          "unit": "pct"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "dom0_cpu_iowait", 
+          "title": "dom0 CPU iowait", 
+          "unit": "pct"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "dom0_cpu_irq", 
+          "title": "dom0 CPU irq", 
+          "unit": "pct"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "dom0_cpu_softirq", 
+          "title": "dom0 CPU softirq", 
+          "unit": "pct"
+        }
+      ], 
+      "name": "Dom0CPUModule", 
+      "period": 15
+    }, 
+    {
+      "consolidation_intervals": [
+        60, 
+        600, 
+        900, 
+        1800, 
+        3600
+      ], 
+      "metrics": [
+        {
+          "enabled": 1, 
+          "name": "dom0_cached", 
+          "title": "dom0 cached", 
+          "unit": "kB"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "dom0_mem_free", 
+          "title": "dom0 mem free", 
+          "unit": "kB"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "dom0_buffers", 
+          "title": "dom0 buffers", 
+          "unit": "kB"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "dom0_swap_total", 
+          "title": "dom0 swap total", 
+          "unit": "kB"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "dom0_swap_cached", 
+          "title": "dom0 swap cached", 
+          "unit": "kB"
+        }, 
+        {
+          "enabled": 1, 
+          "name": "dom0_swap_free", 
+          "title": "dom0 swap free", 
+          "unit": "kB"
+        }
+      ], 
+      "name": "Dom0MemModule", 
+      "period": 15
+    }, 
+    {
+      "consolidation_intervals": [
+        60, 
+        600, 
+        900, 
+        1800, 
+        3600
+      ], 
+      "metrics": [
+        {
+          "enabled": 1, 
+          "name": "dom0_load_one", 
+          "title": "dom0 load one", 
+          "unit": null
+        }, 
+        {
+          "enabled": 1, 
+          "name": "dom0_load_five", 
+          "title": "dom0 load five", 
+          "unit": null
+        }, 
+        {
+          "enabled": 1, 
+          "name": "dom0_load_fifteen", 
+          "title": "dom0 load fifteen", 
+          "unit": null
+        }
+      ], 
+      "name": "Dom0LoadModule", 
+      "period": 15
+    }
+  ] 
+}

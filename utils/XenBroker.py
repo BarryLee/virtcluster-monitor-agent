@@ -1,7 +1,9 @@
 import os
 import re
+import time
 
 from utils import *
+from Singleton import Singleton
 
 def get_total_domU_memory(xm_path, xentop_path):
     return XenBroker(xm_path, xentop_path).getTotalDomUMemory()
@@ -15,15 +17,19 @@ def get_xen_version(xm_path, xentop_path):
 def get_mem_total(xm_path, xentop_path):
     return XenBroker(xm_path, xentop_path).getTotalMemory()
 
+def get_mem_free(xm_path, xentop_path):
+    return XenBroker(xm_path, xentop_path).getFreeMemory()
 
 class XenBrokerException(Exception): pass
     
 
-class XenBroker(object):
+class XenBroker(Singleton):
 
     xentopDelay = 1
 
     xentopIters = 2
+
+    watch_interval = 0.1
 
     def __init__(self, xm_path, xentop_path, dom0_min_mem=128):
         self.dom0MinMem = dom0_min_mem
@@ -34,10 +40,11 @@ class XenBroker(object):
         else:
             prefix = ''
 
-        self.xmCmd = prefix + xm_path
-        self.xentopCmd = prefix + xentop_path
+        self.xmBin = prefix + xm_path
+        self.xentopBin = prefix + xentop_path
 
         self.xmInfo()
+        self.startWatching()
 
     def _xenCmd(self, cmd):
         try:
@@ -45,19 +52,27 @@ class XenBroker(object):
         except ExecCmdException, e:
             raise XenBrokerException, str(e)
 
+    def startWatching(self):
+        def f():
+            while True:
+                #print 'watching'
+                self.updateDomainsDynamicInfo()
+                time.sleep(self.watch_interval)
+        threadinglize(f)()
+
     def update(self):
         self.updateDomainsBasicInfo()
         self.updateDomainsDynamicInfo()
 
     def xmInfo(self):
-        xminfo = proc2dict(self._xenCmd(self.xmCmd + ' info'))
+        xminfo = proc2dict(self._xenCmd(self.xmBin + ' info'))
         self._info['mem_total'] = int(xminfo['total_memory']) * 1024
         self._info['version'] = '%s.%s%s' % (xminfo['xen_major'], 
                 xminfo['xen_minor'], xminfo['xen_extra'])
 
     def updateDomainsBasicInfo(self):
         self._info['domains'] = self._parseXmListOutput(
-                self._xenCmd(self.xmCmd + ' list'))
+                self._xenCmd(self.xmBin + ' list'))
         
     def _parseXmListOutput(self, output):
         xmlist = []
@@ -97,7 +112,7 @@ class XenBroker(object):
 
 
     def _runXentop(self, delay=1, iterations=2):
-        cmd = '%s -b -d %d -i %d' % (self.xentopCmd, delay, iterations)
+        cmd = '%s -b -d %d -i %d' % (self.xentopBin, delay, iterations)
         return self._xenCmd(cmd)
 
     def _parseXentopOutput(self, output):
@@ -156,6 +171,9 @@ class XenBroker(object):
             self.updateDomainsDynamicInfo()
             return self._info['total_domU_memory']
 
+    def getFreeMemory(self):
+        xminfo = proc2dict(self._xenCmd(self.xmBin + ' info'))
+        return int(xminfo['free_memory']) * 1024
 
 if __name__ == '__main__':
     xm_path = '/usr/sbin/xm'
@@ -172,10 +190,10 @@ if __name__ == '__main__':
     count = 5
     import time
     while count:
-        xb.updateDomainsDynamicInfo()
+        #xb.updateDomainsDynamicInfo()
         print xb.getTotalCPUUsage()
         #print get_total_cpu_usage(xm_path, xentop_path)
-        #time.sleep(1)
+        time.sleep(1)
         count -= 1
     #print get_xen_version(xm_path, xentop_path)
     #print get_total_cpu_usage(xm_path, xentop_path)
