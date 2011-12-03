@@ -264,14 +264,16 @@ class Agent(object):
                     #sys.exit(1)
             sleep(self.retry_interval)
 
-
-if __name__ == "__main__":
-    #mod = import_module("CPUModule")
-    #print mod
-    #main()
+def main():
     agent = Agent(global_config)
     server = SimpleXMLRPCServer(('0.0.0.0', global_config.as_int('port')))
     server.register_instance(agent)
     server.serve_forever()
+
+
+if __name__ == "__main__":
+    #mod = import_module("CPUModule")
+    #print mod
+    main()
     
    

@@ -5,8 +5,12 @@ from utils.load_config import load_global_config
 
 from sys import stderr as sys_stderr
 
-startstop(stdout='/dev/null', 
-          stderr=sys_stderr, 
-          pidfile='/tmp/monagent.pid')
+config = load_global_config() 
+ofile = config.get('ofile')
+pfile = config.get('pfile')
+
+startstop(stdout=ofile, 
+          stderr=ofile, 
+          pidfile=pfile)
 main()
 
