@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os.path
+import re
 
 from configobj import ConfigObj
 
@@ -38,12 +39,19 @@ def load_metric_list():
         fp.close()
         return ml
     except Exception, e:
-        def handle_device(device, metric_group, unmonitored_list):
-            if device not in unmonitored_list:
+        def handle_device(device, metric_group, black_list, white_list):
+            if black_list is not None:
+                for i in black_list:
+                    if re.match(i, device) is not None:
+                        return
                 metric_group.setdefault('instances', [])
-                #if not metric_group.has_key('instances'):
-                    #metric_group['instances'] = []
                 metric_group['instances'].append({'device': device})
+            elif white_list is not None:
+                for i in white_list:
+                    if re.match(i, device) is not None:
+                        metric_group.setdefault('instances', [])
+                        metric_group['instances'].append({'device': device})
+                        return
 
         from platform_info import get_network_info
         ifs = get_network_info().keys()
@@ -63,20 +71,22 @@ def load_metric_list():
             if name == 'NetModule':
                 total = metric_conf['network']['total']
                 if len(total):
-                    handle_device(total, metric_group, [])
+                    handle_device(total, metric_group, [], None)
 
-                unmonitored_ifs = metric_conf['network']['black_list']
+                unmonitored_ifs = metric_conf['network'].get('black_list', None)
+                mustmonitored_ifs = metric_conf['network'].get('white_list', None)
                 for iname in ifs:
-                    handle_device(iname, metric_group, unmonitored_ifs)
+                    handle_device(iname, metric_group, unmonitored_ifs, mustmonitored_ifs)
 
             elif name == 'DiskModule':
-                unmonitored_parts = metric_conf['disk']['black_list']
+                unmonitored_parts = metric_conf['disk'].get('black_list', None)
+                mustmonitored_parts = metric_conf['disk'].get('white_list', None)
                 enable_partitions = int(metric_conf['disk']['enable_partitions'])
                 for dname, dparts in disk_parts.iteritems():
-                    handle_device(dname, metric_group, unmonitored_parts)
+                    handle_device(dname, metric_group, unmonitored_parts, mustmonitored_parts)
                     if enable_partitions:
                         for pname in dparts:
-                            handle_device(pname, metric_group, unmonitored_parts)
+                            handle_device(pname, metric_group, unmonitored_parts, mustmonitored_parts)
                         
         fp = open(METRIC_LIST, 'w')
         fp.write(encode(new_list, True))
