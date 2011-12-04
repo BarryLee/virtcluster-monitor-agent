@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import threading
 import os.path
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+import threading
 import socket
 import xmlrpclib
-import sys
 
 from time import sleep
 from SimpleXMLRPCServer import SimpleXMLRPCServer
