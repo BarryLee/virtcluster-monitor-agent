@@ -4,6 +4,6 @@
 *.vim
 *.bak*
 test/*
-monagent/config/metric.list
-monagent/config/agent.conf
-monagent/config/metric.conf
+metric.list
+agent.conf
+metric.conf
