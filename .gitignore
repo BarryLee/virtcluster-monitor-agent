@@ -7,3 +7,4 @@ test/*
 metric.list
 agent.conf
 metric.conf
+logging.conf
