@@ -140,17 +140,20 @@
         {
           "enabled": 1, 
           "name": "load_one", 
-          "title": "load one" 
+          "title": "load one",
+          "unit": ""
         }, 
         {
           "enabled": 1, 
           "name": "load_five", 
-          "title": "load five" 
+          "title": "load five",
+          "unit": ""
         }, 
         {
           "enabled": 1, 
           "name": "load_fifteen", 
-          "title": "load fifteen" 
+          "title": "load fifteen",
+          "unit": ""
         }
       ], 
       "name": "LoadModule", 
@@ -205,62 +208,74 @@
         {
           "enabled": 1, 
           "name": "rps", 
-          "title": "r/s"
+          "title": "r/s",
+          "unit": ""
         }, 
         {
           "enabled": 1, 
           "name": "wps", 
-          "title": "w/s"
+          "title": "w/s",
+          "unit": ""
         }, 
         {
           "enabled": 1, 
           "name": "rrqmps", 
-          "title": "rrqm/s"
+          "title": "rrqm/s",
+          "unit": ""
         }, 
         {
           "enabled": 1, 
           "name": "wrqmps", 
-          "title": "wrqm/s"
+          "title": "wrqm/s",
+          "unit": ""
         }, 
         {
           "enabled": 1, 
           "name": "rsecps", 
-          "title": "rsec/s"
+          "title": "rsec/s",
+          "unit": ""
         }, 
         {
           "enabled": 1, 
           "name": "wsecps", 
-          "title": "wsec/s"
+          "title": "wsec/s",
+          "unit": ""
         }, 
         {
           "enabled": 1, 
           "name": "rkBps", 
-          "title": "rkB/s"
+          "title": "rkB/s",
+          "unit": ""
         }, 
         {
           "enabled": 1, 
           "name": "wkBps", 
-          "title": "wkB/s"
+          "title": "wkB/s",
+          "unit": ""
         }, 
         {
           "enabled": 1, 
           "name": "util",
+          "title": "util%",
           "unit": "pct"
         }, 
         {
           "enabled": 1, 
           "name": "await", 
+          "title": "await",
           "unit": "ms"
         }, 
         {
           "enabled": 1, 
           "name": "avgrq_sz", 
-          "title": "avgrq-sz"
+          "title": "avgrq-sz",
+          "unit": ""
         }, 
         {
           "enabled": 1, 
           "name": "avgqu_sz", 
-          "title": "avgqu-sz"
+          "title": "avgqu-sz",
+          "unit": ""
         }
       ], 
       "name": "DiskModule", 
