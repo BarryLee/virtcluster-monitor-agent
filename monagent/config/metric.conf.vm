@@ -7,7 +7,7 @@ default_list = 'config/metric.list.default'
 [disk]
 # disk module settings
 enable_partitions = 0
-black_list = ,
+black_list = 'dm.*', 'loop.*'
 
 [network]
 # network module settings
