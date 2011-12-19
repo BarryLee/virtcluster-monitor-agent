@@ -4,10 +4,10 @@ is_virtual = 1
 platform = 'linux'
 
 # control server address
-monitor_server = '10.0.0.11:20065'
+monitor_server = 'localhost:20065'
 
 # monitor data storage server address
-data_server = '10.0.0.11:20065'
+data_server = 'localhost:20065'
 
 # network interface to bind
 #interface = 'eth0'
@@ -38,7 +38,7 @@ xentop_path = '/usr/sbin/xentop'
 ifconfig_path = '/sbin/ifconfig'
 
 # times for check alive retry
-retry = 0
+retry = 10
 # interval between retries
 retry_interval = 60
 
