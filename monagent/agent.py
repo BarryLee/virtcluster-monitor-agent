@@ -133,8 +133,7 @@ class Sender(threading.Thread):
                     try:
                         self.collectAndSend()
                     except Exception, e:
-                        logger.exception("")
-                        raise
+                        logger.exception("Oops, error occured")
 
 
 
