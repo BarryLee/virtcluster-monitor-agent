@@ -28,7 +28,7 @@
           "unit": "pct"
         }, 
         {
-          "enabled": 1, 
+          "enabled": 0, 
           "name": "cpu_idle", 
           "title": "CPU idle", 
           "unit": "pct"
@@ -83,7 +83,7 @@
           "unit": "kB"
         }, 
         {
-          "enabled": 1, 
+          "enabled": 0, 
           "name": "mem_available", 
           "title": "mem available", 
           "unit": "kB"
@@ -107,7 +107,7 @@
           "unit": "kB"
         }, 
         {
-          "enabled": 1, 
+          "enabled": 0, 
           "name": "swap_total", 
           "title": "swap total", 
           "unit": "kB"
@@ -230,13 +230,13 @@
           "unit": ""
         }, 
         {
-          "enabled": 1, 
+          "enabled": 0, 
           "name": "rsecps", 
           "title": "rsec/s",
           "unit": ""
         }, 
         {
-          "enabled": 1, 
+          "enabled": 0, 
           "name": "wsecps", 
           "title": "wsec/s",
           "unit": ""
